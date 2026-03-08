@@ -1472,29 +1472,38 @@
             .transport-half {
                 width: 100%;
                 order: 1;
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
                 gap: 6px;
+                align-items: center;
             }
 
             .transport-half .play-btn {
                 padding: 10px 14px;
                 min-width: 56px;
+                grid-row: 1;
+                grid-column: 1;
             }
 
             .transport-half .visualizer {
-                flex: 1;
-                min-width: 60px;
                 height: 40px;
                 min-height: 40px;
-            }
-
-            .transport-half .tempo-tap-group {
-                flex-shrink: 0;
+                grid-row: 1;
+                grid-column: 2;
             }
 
             .transport-half .tap-tempo-btn {
                 padding: 10px 12px;
                 min-width: 48px;
+                grid-row: 2;
+                grid-column: 1;
+            }
+
+            .transport-half .tempo-tap-group {
+                grid-row: 2;
+                grid-column: 2;
+                justify-content: flex-start;
             }
 
             .bar-divider {
@@ -1653,9 +1662,13 @@
                 display: block;
             }
 
-            /* Show all panels regardless of .active */
+            /* Show all panels regardless of .active, with animation */
             .mode-panel {
                 display: block !important;
+                max-height: 2000px;
+                overflow: hidden;
+                transition: max-height 0.4s ease, opacity 0.3s ease;
+                opacity: 1;
             }
 
             /* Show all rhythm categories open on desktop */
@@ -1685,9 +1698,9 @@
                 height: auto;
             }
 
-            /* Collapsed section: hide the panel */
             .mode-panel.section-hidden {
-                display: none !important;
+                max-height: 0 !important;
+                opacity: 0;
                 margin: 0;
                 padding: 0;
             }
