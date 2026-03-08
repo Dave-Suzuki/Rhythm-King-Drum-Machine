@@ -701,6 +701,12 @@
             border-color: #882200;
         }
 
+        .active-rhythm-display.custom-pattern {
+            color: #fff;
+            background: linear-gradient(180deg, #444, #2a2a2a);
+            border-color: #222;
+        }
+
         .active-rhythm-display.latin-rhythm {
             background: linear-gradient(180deg, #cc3333, #992222);
             border-color: #882222;
@@ -1359,11 +1365,6 @@
             overflow: hidden;
         }
 
-        /* Mini pads row (desktop only, shown when Drum Pads collapsed) */
-        .section-pads-row {
-            display: none;
-        }
-
         /* ========== RESPONSIVE ========== */
 
         /* Prevent zoom on double tap */
@@ -1592,17 +1593,6 @@
             .play-top-bar .visualizer {
                 height: 40px;
                 min-height: 40px;
-            }
-
-            /* Mini pads row shown next to collapsed Drum Pads toggle */
-            .section-pads-row {
-                display: flex;
-                gap: 4px;
-                margin-top: 4px;
-            }
-
-            .section-pads-row.hidden {
-                display: none;
             }
 
             /* Wider sequencer on desktop */
@@ -1860,16 +1850,6 @@
         <button class="section-toggle" data-section="padsMode" id="padsSectionToggle">
             <span class="section-arrow">&#9662;</span> Drum Pads
         </button>
-        <div class="section-pads-row" id="sectionPadsRow">
-            <button class="edit-pad" data-drum="kick1">K1</button>
-            <button class="edit-pad" data-drum="kick2">K2</button>
-            <button class="edit-pad" data-drum="snare1">SN</button>
-            <button class="edit-pad" data-drum="clap">CL</button>
-            <button class="edit-pad" data-drum="hihat1">H1</button>
-            <button class="edit-pad" data-drum="hihat2">H2</button>
-            <button class="edit-pad" data-drum="cymbal">CY</button>
-            <button class="edit-pad" data-drum="tom">TM</button>
-        </div>
         <div class="mode-panel pads-mode" id="padsMode">
             <div class="drum-pads">
                 <button class="drum-pad" data-drum="kick1">Kick 1<span class="pad-key">Q</span></button>
@@ -2918,17 +2898,6 @@
                 toggle.classList.add('collapsed');
                 panel.classList.add('section-hidden');
             }
-            // Toggle mini pads row for Drum Pads section
-            if (sectionId === 'padsMode') {
-                var miniRow = document.getElementById('sectionPadsRow');
-                if (miniRow) {
-                    if (toggle.classList.contains('collapsed')) {
-                        miniRow.classList.remove('hidden');
-                    } else {
-                        miniRow.classList.add('hidden');
-                    }
-                }
-            }
             // Re-render sequencer when edit is opened
             if (sectionId === 'editMode' && !toggle.classList.contains('collapsed')) {
                 if (!editMode) {
@@ -3014,7 +2983,7 @@
         if (!display) return;
         if (isCustomPattern) {
             display.textContent = 'Pattern ' + (currentPatternSlot + 1);
-            display.className = 'active-rhythm-display has-rhythm';
+            display.className = 'active-rhythm-display custom-pattern';
         } else if (currentRhythm) {
             display.textContent = currentRhythm.replace(/-/g, ' ');
             var cat = getRhythmCategory(currentRhythm);
@@ -3033,9 +3002,6 @@
 
     // On desktop, show all sections open and enable edit mode
     if (window.innerWidth >= 769) {
-        // Hide mini pads row (all sections open, full pads visible)
-        var miniRow = document.getElementById('sectionPadsRow');
-        if (miniRow) miniRow.classList.add('hidden');
         // Enable edit mode
         if (!editMode) {
             editMode = true;
