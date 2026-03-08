@@ -1183,6 +1183,21 @@
             margin-top: 3px;
         }
 
+        /* Groove knob sub-labels */
+        .groove-sub-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .groove-sub-label {
+            font-size: 0.38em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
         /* Keyboard shortcuts help */
         .shortcuts-overlay {
             position: fixed;
@@ -1965,6 +1980,17 @@
                     </div>
                     <input type="range" class="slider" id="swingSlider" min="0" max="100" value="0">
                 </div>
+                <div class="control-group groove-control">
+                    <label class="control-label">Groove</label>
+                    <div class="groove-sub-labels">
+                        <span class="groove-sub-label">LAID BACK</span>
+                        <span class="groove-sub-label">ON TOP</span>
+                    </div>
+                    <div class="knob-wrapper" data-slider="grooveSlider">
+                        <div class="knob"><div class="knob-indicator"></div></div>
+                    </div>
+                    <input type="range" class="slider" id="grooveSlider" min="0" max="200" value="100">
+                </div>
             </div>
         </div>
 
@@ -2077,6 +2103,26 @@
     let timerID;
     let volume = 0.7;
     let balance = 0.5;
+    let grooveAmount = 0; // -1.0 (laid back) to +1.0 (on top)
+
+    var GROOVE_PROFILES = {
+        kick:      { multiplier: 0.0, maxMs: 20 },
+        kick2:     { multiplier: 0.0, maxMs: 20 },
+        snare:     { multiplier: 1.0, maxMs: 20 },
+        hihat:     { multiplier: 0.6, maxMs: 20 },
+        hihat2:    { multiplier: 0.6, maxMs: 20 },
+        clap:      { multiplier: 0.9, maxMs: 20 },
+        tom:       { multiplier: 0.5, maxMs: 20 },
+        cymbal:    { multiplier: 0.3, maxMs: 20 }
+    };
+
+    function getGrooveOffset(instrument) {
+        var profile = GROOVE_PROFILES[instrument];
+        if (!profile) return 0;
+        var offsetMs = grooveAmount * profile.multiplier * profile.maxMs;
+        var humanize = Math.random() * 6 - 3; // ±3ms
+        return (offsetMs + humanize) / 1000;
+    }
 
     // Tap tempo variables
     let tapTimes = [];
@@ -2692,22 +2738,22 @@
         if (isCustomPattern && customPatterns[currentPatternSlot]) {
             pattern = customPatterns[currentPatternSlot].pattern;
             if (pattern) {
-                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time, 1);
-                if (pattern.kick2 && pattern.kick2[beatNumber]) drumSynth.kick(time, 2);
-                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time);
-                if (pattern.clap && pattern.clap[beatNumber]) drumSynth.clap(time);
-                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time, false);
-                if (pattern.hihat2 && pattern.hihat2[beatNumber]) drumSynth.hihat(time, true);
-                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time);
-                if (pattern.tom && pattern.tom[beatNumber]) drumSynth.tom(time);
+                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(Math.max(time, time + getGrooveOffset('kick')), 1);
+                if (pattern.kick2 && pattern.kick2[beatNumber]) drumSynth.kick(Math.max(time, time + getGrooveOffset('kick2')), 2);
+                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(Math.max(time, time + getGrooveOffset('snare')));
+                if (pattern.clap && pattern.clap[beatNumber]) drumSynth.clap(Math.max(time, time + getGrooveOffset('clap')));
+                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(Math.max(time, time + getGrooveOffset('hihat')), false);
+                if (pattern.hihat2 && pattern.hihat2[beatNumber]) drumSynth.hihat(Math.max(time, time + getGrooveOffset('hihat2')), true);
+                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(Math.max(time, time + getGrooveOffset('cymbal')));
+                if (pattern.tom && pattern.tom[beatNumber]) drumSynth.tom(Math.max(time, time + getGrooveOffset('tom')));
             }
         } else if (currentRhythm && rhythmPatterns[currentRhythm]) {
             pattern = rhythmPatterns[currentRhythm];
             if (pattern) {
-                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time, 1);
-                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time);
-                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time, false);
-                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time);
+                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(Math.max(time, time + getGrooveOffset('kick')), 1);
+                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(Math.max(time, time + getGrooveOffset('snare')));
+                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(Math.max(time, time + getGrooveOffset('hihat')), false);
+                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(Math.max(time, time + getGrooveOffset('cymbal')));
             }
         }
 
@@ -2912,6 +2958,22 @@
         if (sv) sv.textContent = swing + '%';
     });
 
+    // Groove control (slider range 0-200, mapped to -1.0 to +1.0)
+    document.getElementById('grooveSlider').addEventListener('input', function(e) {
+        var raw = parseInt(e.target.value);
+        // Snap to center (100) when within ±5
+        if (Math.abs(raw - 100) <= 5) {
+            raw = 100;
+            e.target.value = 100;
+        }
+        grooveAmount = (raw - 100) / 100;
+        var gv = document.getElementById('grooveValue');
+        if (gv) {
+            var pct = Math.round(grooveAmount * 100);
+            gv.textContent = (pct > 0 ? '+' : '') + pct + '%';
+        }
+    });
+
     // Rotary knob interaction
     (function() {
         var knobAngleRange = 270; // degrees of rotation
@@ -2940,6 +3002,12 @@
             } else if (sliderId === 'swingSlider') {
                 var el = document.getElementById('swingValue');
                 if (el) el.textContent = val + '%';
+            } else if (sliderId === 'grooveSlider') {
+                var el = document.getElementById('grooveValue');
+                if (el) {
+                    var pct = Math.round((val - 100));
+                    el.textContent = (pct > 0 ? '+' : '') + pct + '%';
+                }
             }
         }
 
@@ -2970,6 +3038,11 @@
                 var dy = startY - pt.clientY;
                 var sensitivity = range / 120;
                 var newVal = Math.round(Math.min(slider.max, Math.max(slider.min, startVal + dy * sensitivity)));
+                // Center snap for groove knob
+                if (sliderId === 'grooveSlider') {
+                    var mid = (parseFloat(slider.max) + parseFloat(slider.min)) / 2;
+                    if (Math.abs(newVal - mid) <= 5) newVal = mid;
+                }
                 slider.value = newVal;
                 slider.dispatchEvent(new Event('input'));
                 setKnobRotation(wrapper, getSliderNorm(slider));
@@ -3418,6 +3491,7 @@
             date: new Date().toISOString(),
             tempo: tempo,
             swing: swing,
+            groove: grooveAmount,
             patterns: JSON.parse(JSON.stringify(customPatterns)),
             version: '2.0'
         };
@@ -3487,12 +3561,15 @@
         customPatterns = JSON.parse(JSON.stringify(project.patterns));
         tempo = project.tempo || 120;
         swing = project.swing || 0;
+        grooveAmount = project.groove || 0;
 
         document.getElementById('projectNameInput').value = project.name;
         document.getElementById('tempoSlider').value = tempo;
         document.getElementById('tempoDisplay').textContent = tempo;
         document.getElementById('swingSlider').value = swing;
         document.getElementById('swingDisplay').textContent = swing + '%';
+        document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
+        document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
         document.title = project.name + ' - Maestro Rhythm King MRK-2';
 
         for (var i = 0; i < 8; i++) updatePatternHasData(i);
@@ -3526,6 +3603,7 @@
                 date: new Date().toISOString(),
                 tempo: tempo,
                 swing: swing,
+                groove: grooveAmount,
                 patterns: JSON.parse(JSON.stringify(customPatterns)),
                 version: '2.0',
                 type: 'MRK2_PROJECT'
@@ -3560,12 +3638,15 @@
                 customPatterns = JSON.parse(JSON.stringify(projectData.patterns));
                 tempo = projectData.tempo || 120;
                 swing = projectData.swing || 0;
+                grooveAmount = projectData.groove || 0;
 
                 document.getElementById('projectNameInput').value = projectData.name + ' (Imported)';
                 document.getElementById('tempoSlider').value = tempo;
                 document.getElementById('tempoDisplay').textContent = tempo;
                 document.getElementById('swingSlider').value = swing;
                 document.getElementById('swingDisplay').textContent = swing + '%';
+                document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
+                document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
 
                 for (var i = 0; i < 8; i++) updatePatternHasData(i);
                 saveProject();
@@ -3603,6 +3684,7 @@
             name: document.getElementById('projectNameInput').value || 'MRK-2 Project',
             tempo: tempo,
             swing: swing,
+            groove: grooveAmount,
             patterns: JSON.parse(JSON.stringify(customPatterns))
         };
 
@@ -3626,12 +3708,15 @@
                 customPatterns = shareData.patterns;
                 tempo = shareData.tempo || 120;
                 swing = shareData.swing || 0;
+                grooveAmount = shareData.groove || 0;
 
                 document.getElementById('projectNameInput').value = shareData.name + ' (Shared)';
                 document.getElementById('tempoSlider').value = tempo;
                 document.getElementById('tempoDisplay').textContent = tempo;
                 document.getElementById('swingSlider').value = swing;
                 document.getElementById('swingDisplay').textContent = swing + '%';
+                document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
+                document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
 
                 for (var i = 0; i < 8; i++) updatePatternHasData(i);
                 window.location.hash = '';
