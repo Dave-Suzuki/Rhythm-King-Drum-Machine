@@ -458,11 +458,10 @@
 
         .tempo-tap-group {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
             flex-shrink: 0;
-            gap: 2px;
+            gap: 6px;
         }
 
         .play-top-bar .tempo-display {
@@ -476,11 +475,11 @@
         }
 
         .play-top-bar .tempo-unit {
-            font-size: 0.55em;
+            font-size: 0.6em;
             font-weight: 600;
             color: #666;
             text-transform: uppercase;
-            line-height: 1;
+            margin-right: 2px;
         }
 
         .play-top-bar .visualizer {
@@ -998,8 +997,9 @@
 
         .pattern-slot.active {
             border-color: #cc3300;
-            color: #ff6644;
-            background: linear-gradient(180deg, #555, #3a3a3a);
+            color: #fff;
+            background: linear-gradient(180deg, #cc3300, #992200);
+            box-shadow: 0 2px 6px rgba(204,51,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
         }
 
         .pattern-slot.has-data::after {
@@ -1007,11 +1007,15 @@
             position: absolute;
             top: 4px;
             right: 6px;
-            width: 5px;
-            height: 5px;
-            background: #00cc00;
+            width: 4px;
+            height: 4px;
+            background: #888;
             border-radius: 50%;
-            box-shadow: 0 0 4px #00cc00;
+            box-shadow: none;
+        }
+
+        .pattern-slot.active.has-data::after {
+            background: #fff;
         }
 
         .step-sequencer {
@@ -2034,91 +2038,84 @@
             var kickLevel = 1 - (balance * 0.5);
 
             if (variant === 1) {
-                // KICK 1: Punchy, tight analog kick - higher pitch, short decay
+                // KICK 1: Classic tight kick - punchy mid-bass, quick decay
                 var osc = this.context.createOscillator();
                 var gain = this.context.createGain();
                 var filter = this.context.createBiquadFilter();
 
                 filter.type = 'lowpass';
-                filter.frequency.value = 200;
+                filter.frequency.value = 120;
 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(150, time);
-                osc.frequency.exponentialRampToValueAtTime(40, time + 0.06);
+                osc.frequency.setValueAtTime(80, time);
+                osc.frequency.exponentialRampToValueAtTime(35, time + 0.08);
 
-                gain.gain.setValueAtTime(0.9 * kickLevel, time);
-                gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
+                gain.gain.setValueAtTime(0.85 * kickLevel, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + 0.25);
 
                 osc.connect(filter);
                 filter.connect(gain);
                 gain.connect(this.masterGain);
                 osc.start(time);
-                osc.stop(time + 0.2);
+                osc.stop(time + 0.25);
 
-                // Sharp attack click
+                // Click transient
                 var click = this.context.createOscillator();
                 var clickGain = this.context.createGain();
                 click.type = 'square';
-                click.frequency.value = 300;
-                clickGain.gain.setValueAtTime(0.2 * kickLevel, time);
+                click.frequency.value = 220;
+                clickGain.gain.setValueAtTime(0.15 * kickLevel, time);
                 clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.015);
                 click.connect(clickGain);
                 clickGain.connect(this.masterGain);
                 click.start(time);
                 click.stop(time + 0.015);
             } else {
-                // KICK 2: Deep sub-bass kick - low frequency, long sustain, layered harmonics
-                // Sub oscillator - very low fundamental
+                // KICK 2: Deep floor kick - lower pitch, longer body, sub-bass weight
+                var osc = this.context.createOscillator();
+                var gain = this.context.createGain();
+                var filter = this.context.createBiquadFilter();
+
+                filter.type = 'lowpass';
+                filter.frequency.value = 80;
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(55, time);
+                osc.frequency.exponentialRampToValueAtTime(28, time + 0.12);
+
+                gain.gain.setValueAtTime(0.9 * kickLevel, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start(time);
+                osc.stop(time + 0.4);
+
+                // Sub harmonic layer for weight
                 var sub = this.context.createOscillator();
                 var subGain = this.context.createGain();
                 sub.type = 'sine';
-                sub.frequency.setValueAtTime(55, time);
-                sub.frequency.exponentialRampToValueAtTime(25, time + 0.15);
-                subGain.gain.setValueAtTime(1.0 * kickLevel, time);
-                subGain.gain.setValueAtTime(0.8 * kickLevel, time + 0.05);
-                subGain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+                sub.frequency.setValueAtTime(40, time);
+                sub.frequency.exponentialRampToValueAtTime(22, time + 0.15);
+                subGain.gain.setValueAtTime(0.4 * kickLevel, time);
+                subGain.gain.exponentialRampToValueAtTime(0.01, time + 0.35);
                 sub.connect(subGain);
                 subGain.connect(this.masterGain);
                 sub.start(time);
-                sub.stop(time + 0.5);
+                sub.stop(time + 0.35);
 
-                // Second harmonic layer for warmth
-                var harm = this.context.createOscillator();
-                var harmGain = this.context.createGain();
-                harm.type = 'sine';
-                harm.frequency.setValueAtTime(110, time);
-                harm.frequency.exponentialRampToValueAtTime(50, time + 0.1);
-                harmGain.gain.setValueAtTime(0.35 * kickLevel, time);
-                harmGain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-                harm.connect(harmGain);
-                harmGain.connect(this.masterGain);
-                harm.start(time);
-                harm.stop(time + 0.3);
-
-                // Third harmonic for chest thump
-                var thump = this.context.createOscillator();
-                var thumpGain = this.context.createGain();
-                thump.type = 'triangle';
-                thump.frequency.setValueAtTime(80, time);
-                thump.frequency.exponentialRampToValueAtTime(30, time + 0.08);
-                thumpGain.gain.setValueAtTime(0.25 * kickLevel, time);
-                thumpGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
-                thump.connect(thumpGain);
-                thumpGain.connect(this.masterGain);
-                thump.start(time);
-                thump.stop(time + 0.2);
-
-                // Soft click transient
+                // Soft click
                 var click = this.context.createOscillator();
                 var clickGain = this.context.createGain();
                 click.type = 'sine';
                 click.frequency.value = 160;
-                clickGain.gain.setValueAtTime(0.1 * kickLevel, time);
-                clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.025);
+                clickGain.gain.setValueAtTime(0.08 * kickLevel, time);
+                clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.02);
                 click.connect(clickGain);
                 clickGain.connect(this.masterGain);
                 click.start(time);
-                click.stop(time + 0.025);
+                click.stop(time + 0.02);
             }
         }
 
