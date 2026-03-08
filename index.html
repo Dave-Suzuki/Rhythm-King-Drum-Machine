@@ -26,7 +26,7 @@
 
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #1a1a1a;
+            background: #2a2a2a;
             color: #2a2a2a;
             min-height: 100vh;
             min-height: 100dvh;
@@ -40,43 +40,51 @@
         }
 
         .drum-machine {
-            background: linear-gradient(180deg, #c8c8d0 0%, #a8a8b2 50%, #9898a0 100%);
-            border-radius: 14px;
-            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 0;
             box-shadow:
-                0 10px 40px rgba(0,0,0,0.6),
-                inset 0 2px 0 rgba(255,255,255,0.4),
-                inset 0 -2px 0 rgba(0,0,0,0.15);
+                0 10px 40px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.05);
             max-width: 900px;
             width: 100%;
             position: relative;
-            border: 2px solid #888;
+            border: 3px solid #333;
             margin: 0;
             overflow: hidden;
         }
 
+        /* === TOP BLACK PANEL === */
+        .top-panel {
+            background: #111;
+            padding: 16px 20px 12px;
+            border-bottom: 2px solid #444;
+            position: relative;
+        }
+
         .machine-header {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             position: relative;
-            padding: 8px 40px;
-            border-bottom: 2px solid rgba(0,0,0,0.1);
+            padding: 4px 40px;
+            border-bottom: none;
         }
 
         .machine-title {
-            font-size: 1.6em;
-            font-weight: 800;
-            color: #2a2a2a;
+            font-size: 1.4em;
+            font-weight: 300;
+            color: #d0d0d0;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+            letter-spacing: 12px;
+            text-shadow: none;
         }
 
         .machine-subtitle {
             color: #666;
-            font-size: 0.75em;
+            font-size: 0.65em;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 4px;
+            margin-top: 2px;
         }
 
         .power-indicator {
@@ -130,7 +138,7 @@
         .menu-button span {
             width: 24px;
             height: 2px;
-            background: #555;
+            background: #888;
             transition: all 0.3s;
             border-radius: 2px;
         }
@@ -173,14 +181,14 @@
             right: -350px;
             width: 350px;
             height: 100%;
-            background: linear-gradient(180deg, #c0c0c8, #a0a0a8);
-            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.7);
             transition: right 0.3s ease;
             z-index: 999;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            color: #2a2a2a;
+            color: #ccc;
         }
 
         .slide-menu.active {
@@ -196,7 +204,7 @@
         }
 
         .menu-header h3 {
-            color: #333;
+            color: #ccc;
             font-size: 1.2em;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -205,7 +213,7 @@
         .menu-close {
             background: transparent;
             border: none;
-            color: #666;
+            color: #888;
             font-size: 2em;
             cursor: pointer;
             transition: color 0.3s;
@@ -213,16 +221,16 @@
         }
 
         .menu-close:hover {
-            color: #222;
+            color: #fff;
         }
 
         .menu-section {
             padding: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid #444;
         }
 
         .menu-section-title {
-            color: #666;
+            color: #999;
             font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -232,9 +240,9 @@
         .menu-item {
             width: 100%;
             padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0,0,0,0.1);
-            color: #333;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+            color: #ccc;
             text-align: left;
             cursor: pointer;
             transition: all 0.3s;
@@ -247,9 +255,9 @@
         }
 
         .menu-item:hover {
-            background: rgba(0, 0, 0, 0.1);
-            border-color: #888;
-            color: #111;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #666;
+            color: #fff;
             transform: translateX(5px);
         }
 
@@ -267,9 +275,9 @@
 
         .project-name-input {
             width: 100%;
-            background: rgba(255,255,255,0.5);
-            border: 1px solid #999;
-            color: #222;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #555;
+            color: #eee;
             padding: 10px 12px;
             border-radius: 6px;
             font-size: 1em;
@@ -283,8 +291,8 @@
         /* Recent Projects */
         .recent-project-item {
             padding: 10px;
-            background: rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0,0,0,0.12);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #444;
             border-radius: 6px;
             margin-bottom: 8px;
             cursor: pointer;
@@ -293,8 +301,8 @@
         }
 
         .recent-project-item:hover {
-            background: rgba(0, 0, 0, 0.08);
-            border-color: #888;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #666;
             transform: translateX(5px);
         }
 
@@ -304,13 +312,13 @@
         }
 
         .recent-project-name {
-            color: #333;
+            color: #ccc;
             font-size: 0.95em;
             margin-bottom: 4px;
         }
 
         .recent-project-info {
-            color: #888;
+            color: #777;
             font-size: 0.8em;
             display: flex;
             justify-content: space-between;
@@ -319,7 +327,7 @@
         .menu-footer {
             margin-top: auto;
             padding: 15px;
-            border-top: 1px solid rgba(0,0,0,0.1);
+            border-top: 1px solid #444;
             text-align: center;
         }
 
@@ -370,17 +378,18 @@
         }
 
         .modal-content {
-            background: linear-gradient(180deg, #c8c8d0, #a8a8b2);
+            background: linear-gradient(180deg, #333, #222);
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
             max-width: 400px;
             width: 90%;
-            color: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #555;
         }
 
         .modal-title {
-            color: #333;
+            color: #ddd;
             font-size: 1.2em;
             margin-bottom: 20px;
             text-transform: uppercase;
@@ -390,9 +399,9 @@
         .modal-input {
             width: 100%;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 1px solid #999;
-            color: #222;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #555;
+            color: #eee;
             border-radius: 6px;
             font-size: 1em;
             margin-bottom: 20px;
@@ -421,26 +430,32 @@
         }
 
         .modal-btn-secondary {
-            background: linear-gradient(180deg, #b0b0b8, #909098);
-            color: #333;
-            border: 1px solid #777;
+            background: linear-gradient(180deg, #555, #3a3a3a);
+            color: #ccc;
+            border: 1px solid #666;
         }
 
         .modal-btn:active {
             transform: translateY(1px);
         }
 
-        /* Transport bar: [Play] [BPM] [visualizer] [Tap] */
-        /* Transport bar: [Play/Stop] [visualizer] [BPM + Tap] */
+        /* === BOTTOM CREAM PANEL === */
+        .bottom-panel {
+            background: linear-gradient(180deg, #d4cfc4 0%, #c8c2b6 50%, #bfb9ad 100%);
+            padding: 14px 20px;
+            border-top: 2px solid #888;
+        }
+
+        /* Transport bar */
         .play-top-bar {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: stretch;
             margin-bottom: 8px;
-            padding: 6px 8px;
-            background: rgba(0,0,0,0.06);
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.1);
+            padding: 8px 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 6px;
+            border: 1px solid #555;
         }
 
         .play-top-bar .play-btn,
@@ -468,7 +483,7 @@
             font-family: 'Courier New', monospace;
             font-size: 1.4em;
             font-weight: 800;
-            color: #222;
+            color: #eee;
             text-align: center;
             line-height: 1;
             margin: 0;
@@ -477,7 +492,7 @@
         .play-top-bar .tempo-unit {
             font-size: 0.6em;
             font-weight: 600;
-            color: #666;
+            color: #999;
             text-transform: uppercase;
             margin-right: 2px;
         }
@@ -494,10 +509,10 @@
             display: flex;
             gap: 8px;
             margin-bottom: 8px;
-            padding: 6px 8px;
-            background: rgba(0,0,0,0.08);
+            padding: 8px 10px;
+            background: rgba(0,0,0,0.5);
             border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
+            border: 1px solid #555;
             align-items: center;
         }
 
@@ -518,11 +533,11 @@
         .control-label {
             display: block;
             margin-bottom: 6px;
-            font-size: 0.7em;
-            color: #555;
+            font-size: 0.65em;
+            color: #ccc;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .slider {
@@ -530,32 +545,32 @@
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: linear-gradient(90deg, #777 0%, #999 100%);
+            background: linear-gradient(90deg, #555 0%, #777 100%);
             outline: none;
             margin-top: 8px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: linear-gradient(145deg, #e0e0e0, #aaa);
+            background: radial-gradient(circle at 35% 35%, #ddd, #999 60%, #777);
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
-            border: 1px solid #888;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+            border: 1px solid #666;
         }
 
         .slider::-moz-range-thumb {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: linear-gradient(145deg, #e0e0e0, #aaa);
+            background: radial-gradient(circle at 35% 35%, #ddd, #999 60%, #777);
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
-            border: 1px solid #888;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+            border: 1px solid #666;
         }
 
         .transport-controls {
@@ -579,14 +594,14 @@
         }
 
         .play-btn {
-            background: linear-gradient(180deg, #449944, #336633);
+            background: linear-gradient(180deg, #449944, #2a6a2a);
             color: white;
-            border-color: #2a5a2a;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            border-color: #1a4a1a;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
         .play-btn:hover {
-            background: linear-gradient(180deg, #55aa55, #448844);
+            background: linear-gradient(180deg, #55aa55, #3a7a3a);
         }
 
         .play-btn:active {
@@ -597,23 +612,23 @@
         .play-btn.playing {
             background: linear-gradient(180deg, #cc3333, #aa2222);
             border-color: #882222;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
         .tap-tempo-btn {
-            background: linear-gradient(180deg, #b0b0b8, #909098);
-            color: #333;
-            border-color: #777;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4);
+            background: linear-gradient(180deg, #888, #666);
+            color: #eee;
+            border-color: #555;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
         }
 
         .tap-tempo-btn:hover {
-            background: linear-gradient(180deg, #c0c0c8, #a0a0a8);
+            background: linear-gradient(180deg, #999, #777);
         }
 
         .tap-tempo-btn:active {
             transform: translateY(1px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .rhythm-section {
@@ -621,7 +636,7 @@
         }
 
         .rhythm-category {
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         /* Accordion toggle header */
@@ -630,28 +645,29 @@
             align-items: center;
             gap: 8px;
             width: 100%;
-            padding: 8px 10px;
-            background: rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 5px;
+            padding: 6px 10px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            border-radius: 0;
             cursor: pointer;
-            font-size: 0.7em;
-            color: #444;
+            font-size: 0.6em;
+            color: #888;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 700;
+            letter-spacing: 2px;
+            font-weight: 600;
             text-align: left;
             transition: all 0.15s;
         }
 
         .category-toggle:active {
-            background: rgba(0,0,0,0.1);
+            color: #bbb;
         }
 
         .category-toggle.open {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
-            border-bottom-color: transparent;
+            border-bottom-color: #333;
         }
 
         .category-toggle.open .category-arrow {
@@ -667,7 +683,7 @@
 
         .latin-dot { background: #cc3333; }
         .american-dot { background: #cc8822; }
-        .traditional-dot { background: #3366aa; }
+        .traditional-dot { background: #558833; }
 
         .category-arrow {
             margin-left: auto;
@@ -677,27 +693,27 @@
 
         .rhythm-buttons.open {
             display: grid !important;
-            border: 1px solid rgba(0,0,0,0.1);
+            border: none;
             border-top: none;
-            border-radius: 0 0 5px 5px;
-            padding: 6px;
-            margin-bottom: 4px;
-            background: rgba(0,0,0,0.03);
+            border-radius: 0;
+            padding: 6px 0;
+            margin-bottom: 0;
+            background: transparent;
         }
 
         /* Active rhythm display chip */
         .active-rhythm-display {
             margin-top: 6px;
             padding: 6px 10px;
-            background: rgba(0,0,0,0.06);
-            border-radius: 5px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
             font-size: 0.75em;
             color: #666;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
-            border: 1px solid rgba(0,0,0,0.08);
+            border: 1px solid #333;
         }
 
         .active-rhythm-display.has-rhythm {
@@ -709,7 +725,7 @@
         .active-rhythm-display.custom-pattern {
             color: #fff;
             background: linear-gradient(180deg, #444, #2a2a2a);
-            border-color: #222;
+            border-color: #555;
         }
 
         .active-rhythm-display.latin-rhythm {
@@ -723,30 +739,30 @@
         }
 
         .active-rhythm-display.traditional-rhythm {
-            background: linear-gradient(180deg, #3366aa, #224488);
-            border-color: #223366;
+            background: linear-gradient(180deg, #558833, #3a6622);
+            border-color: #2a5522;
         }
 
         .rhythm-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 6px;
+            gap: 5px;
         }
 
         .rhythm-btn {
-            padding: 10px 6px;
-            border: 2px solid transparent;
-            border-radius: 5px;
+            padding: 8px 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 0.75em;
+            font-size: 0.7em;
             font-weight: 700;
             text-transform: uppercase;
-            transition: all 0.15s;
+            transition: all 0.1s;
             position: relative;
             overflow: hidden;
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-            min-height: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+            min-height: 36px;
             letter-spacing: 0.5px;
         }
 
@@ -758,19 +774,20 @@
         .rhythm-btn.active {
             transform: translateY(1px);
             box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
-            border-color: rgba(255,255,255,0.4);
+            border-color: rgba(255,255,255,0.5);
+            filter: brightness(1.3);
         }
 
         .rhythm-btn.active::after {
             content: '';
             position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 6px;
-            height: 6px;
-            background: #00cc00;
+            top: 3px;
+            right: 3px;
+            width: 5px;
+            height: 5px;
+            background: #00ff00;
             border-radius: 50%;
-            box-shadow: 0 0 6px #00cc00;
+            box-shadow: 0 0 6px #00ff00;
             animation: pulse 1s infinite;
         }
 
@@ -781,17 +798,14 @@
 
         .latin-btn {
             background: linear-gradient(180deg, #cc3333, #992222);
-            border-color: #882222;
         }
 
         .american-btn {
             background: linear-gradient(180deg, #cc8822, #996611);
-            border-color: #885511;
         }
 
         .traditional-btn {
-            background: linear-gradient(180deg, #3366aa, #224488);
-            border-color: #223366;
+            background: linear-gradient(180deg, #558833, #3a6622);
         }
 
         .drum-pads {
@@ -843,7 +857,7 @@
         .tempo-display {
             font-family: 'Courier New', monospace;
             font-weight: bold;
-            color: #333;
+            color: #eee;
         }
 
         /* Waveform Visualizer */
@@ -898,9 +912,9 @@
         /* Pattern Editor Styles */
         .pattern-editor {
             padding: 12px;
-            background: rgba(0,0,0,0.08);
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            border: 1px solid #444;
         }
 
         .editor-header {
@@ -914,7 +928,7 @@
 
         .editor-title {
             font-size: 1em;
-            color: #333;
+            color: #ccc;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 700;
@@ -929,21 +943,21 @@
 
         .pattern-btn {
             padding: 8px 12px;
-            background: linear-gradient(180deg, #b0b0b8, #909098);
-            border: 1px solid #777;
-            color: #333;
-            border-radius: 5px;
+            background: linear-gradient(180deg, #555, #3a3a3a);
+            border: 1px solid #666;
+            color: #ccc;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 0.8em;
             text-transform: uppercase;
             transition: all 0.15s;
             font-weight: 600;
-            box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
             min-height: 36px;
         }
 
         .pattern-btn:hover:not(:disabled) {
-            background: linear-gradient(180deg, #c0c0c8, #a0a0a8);
+            background: linear-gradient(180deg, #666, #4a4a4a);
         }
 
         .pattern-btn:active:not(:disabled) {
@@ -1116,18 +1130,18 @@
 
         .pattern-info {
             font-size: 0.7em;
-            color: #666;
+            color: #999;
             margin: 10px 0;
             text-align: center;
             padding: 8px;
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 5px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            border: 1px solid #444;
             line-height: 1.5;
         }
 
         .pattern-info strong {
-            color: #333;
+            color: #ccc;
         }
 
         /* Swing indicator */
@@ -1157,19 +1171,19 @@
         }
 
         .shortcuts-content {
-            background: linear-gradient(180deg, #c8c8d0, #a8a8b2);
+            background: linear-gradient(180deg, #333, #222);
             padding: 24px;
             border-radius: 12px;
             max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
-            border: 1px solid #888;
-            color: #2a2a2a;
+            border: 1px solid #555;
+            color: #ccc;
         }
 
         .shortcuts-content h3 {
-            color: #333;
+            color: #ddd;
             margin-bottom: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -1179,22 +1193,22 @@
             display: flex;
             justify-content: space-between;
             padding: 6px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid #444;
             align-items: center;
         }
 
         .shortcut-key {
-            background: rgba(0,0,0,0.1);
-            color: #333;
+            background: rgba(255,255,255,0.1);
+            color: #ddd;
             padding: 3px 8px;
             border-radius: 4px;
             font-family: 'Courier New', monospace;
             font-size: 0.85em;
-            border: 1px solid rgba(0,0,0,0.15);
+            border: 1px solid #555;
         }
 
         .shortcut-desc {
-            color: #555;
+            color: #999;
             font-size: 0.9em;
         }
 
@@ -1202,9 +1216,9 @@
             margin-top: 16px;
             width: 100%;
             padding: 10px;
-            background: linear-gradient(180deg, #b0b0b8, #909098);
-            border: 1px solid #777;
-            color: #333;
+            background: linear-gradient(180deg, #555, #3a3a3a);
+            border: 1px solid #666;
+            color: #ccc;
             border-radius: 6px;
             cursor: pointer;
             text-transform: uppercase;
@@ -1213,7 +1227,7 @@
         }
 
         .shortcuts-close:hover {
-            background: linear-gradient(180deg, #c0c0c8, #a0a0a8);
+            background: linear-gradient(180deg, #666, #4a4a4a);
         }
 
         /* Toast notification */
@@ -1282,10 +1296,10 @@
             display: none; /* hidden on mobile, shown on desktop */
             width: 100%;
             padding: 8px 12px;
-            background: linear-gradient(180deg, #b0b0b8, #909098);
-            border: 1px solid rgba(0,0,0,0.15);
-            border-radius: 5px;
-            color: #333;
+            background: linear-gradient(180deg, #444, #333);
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #ccc;
             font-size: 0.8em;
             font-weight: 700;
             text-transform: uppercase;
@@ -1297,7 +1311,7 @@
         }
 
         .section-toggle:hover {
-            background: linear-gradient(180deg, #c0c0c8, #a0a0a8);
+            background: linear-gradient(180deg, #555, #444);
         }
 
         .section-toggle .section-arrow {
@@ -1326,10 +1340,10 @@
             left: 0;
             right: 0;
             display: flex;
-            background: linear-gradient(180deg, #b8b8c0, #909098);
-            border-top: 1px solid #777;
+            background: linear-gradient(180deg, #333, #222);
+            border-top: 1px solid #555;
             z-index: 997;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.5);
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
@@ -1338,7 +1352,7 @@
             padding: 10px 8px;
             border: none;
             background: transparent;
-            color: #555;
+            color: #888;
             font-size: 0.7em;
             font-weight: 700;
             text-transform: uppercase;
@@ -1358,11 +1372,11 @@
 
         .mode-tab.active {
             color: #cc3300;
-            background: rgba(204, 51, 0, 0.08);
+            background: rgba(204, 51, 0, 0.1);
         }
 
         .mode-tab:active {
-            background: rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.05);
         }
 
         /* Pads mode: maximize pad area but fit on screen */
@@ -1394,17 +1408,25 @@
             }
 
             .drum-machine {
-                padding: 12px;
-                border-radius: 10px;
+                padding: 0;
+                border-radius: 8px;
+            }
+
+            .top-panel {
+                padding: 12px 12px 8px;
+            }
+
+            .bottom-panel {
+                padding: 10px 12px;
             }
 
             .machine-header {
-                padding: 6px 36px;
+                padding: 4px 36px;
                 margin-bottom: 8px;
             }
 
             .machine-title {
-                font-size: 1.2em;
+                font-size: 1.1em;
                 letter-spacing: 1.5px;
             }
 
@@ -1642,8 +1664,8 @@
     <div class="drum-machine">
         <div class="machine-header">
             <div class="power-indicator"></div>
-            <h1 class="machine-title">Rhythm King MRK-2</h1>
-            <p class="machine-subtitle">Analog Drum Machine</p>
+            <h1 class="machine-title">Rhythm King</h1>
+            <p class="machine-subtitle">Maestro MRK-2</p>
             <button class="menu-button" id="menuButton">
                 <span></span>
                 <span></span>
@@ -1733,38 +1755,8 @@
             </div>
         </div>
 
-        <!-- PERSISTENT TOP BAR (all modes) -->
-        <div class="play-top-bar">
-            <button class="transport-btn play-btn" id="playBtn">Play</button>
-            <div class="visualizer" id="visualizer">
-                <canvas id="waveformCanvas"></canvas>
-                <div class="beat-overlay" id="beatOverlay"></div>
-            </div>
-            <div class="tempo-tap-group">
-                <div class="tempo-display" id="tempoDisplay">120</div>
-                <span class="tempo-unit">BPM</span>
-                <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">TAP</button>
-            </div>
-        </div>
-
-        <div class="controls-row">
-            <div class="control-group">
-                <label class="control-label">Vol</label>
-                <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="70">
-            </div>
-            <div class="control-group">
-                <label class="control-label">Tone</label>
-                <input type="range" class="slider" id="balanceSlider" min="0" max="100" value="50">
-            </div>
-            <div class="control-group">
-                <label class="control-label">Speed</label>
-                <input type="range" class="slider" id="tempoSlider" min="60" max="200" value="120">
-            </div>
-            <div class="control-group">
-                <label class="control-label">Swing <span id="swingDisplay" style="font-size:0.9em">0%</span></label>
-                <input type="range" class="slider" id="swingSlider" min="0" max="100" value="0">
-            </div>
-        </div>
+        <!-- === TOP BLACK PANEL: Rhythm Selector === -->
+        <div class="top-panel">
 
         <!-- MODE 1: PLAY (default) -->
         <button class="section-toggle" data-section="playMode">
@@ -1776,7 +1768,7 @@
                 <div class="rhythm-category">
                     <button class="category-toggle open" data-category="latin">
                         <span class="category-dot latin-dot"></span>
-                        Latin American
+                        Latin
                         <span class="category-arrow">&#9662;</span>
                     </button>
                     <div class="rhythm-buttons open" id="latinButtons">
@@ -1838,6 +1830,44 @@
             </div>
         </div>
 
+        </div><!-- end top-panel -->
+
+        <!-- === BOTTOM CREAM PANEL: Controls === -->
+        <div class="bottom-panel">
+
+        <!-- PERSISTENT TOP BAR (all modes) -->
+        <div class="play-top-bar">
+            <button class="transport-btn play-btn" id="playBtn">Play</button>
+            <div class="visualizer" id="visualizer">
+                <canvas id="waveformCanvas"></canvas>
+                <div class="beat-overlay" id="beatOverlay"></div>
+            </div>
+            <div class="tempo-tap-group">
+                <div class="tempo-display" id="tempoDisplay">120</div>
+                <span class="tempo-unit">BPM</span>
+                <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">TAP</button>
+            </div>
+        </div>
+
+        <div class="controls-row">
+            <div class="control-group">
+                <label class="control-label">Vol</label>
+                <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="70">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Tone</label>
+                <input type="range" class="slider" id="balanceSlider" min="0" max="100" value="50">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Speed</label>
+                <input type="range" class="slider" id="tempoSlider" min="60" max="200" value="120">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Swing <span id="swingDisplay" style="font-size:0.9em">0%</span></label>
+                <input type="range" class="slider" id="swingSlider" min="0" max="100" value="0">
+            </div>
+        </div>
+
         <!-- MODE 2: EDIT -->
         <button class="section-toggle" data-section="editMode">
             <span class="section-arrow">&#9662;</span> Pattern Editor
@@ -1890,6 +1920,8 @@
                 <button class="drum-pad" data-drum="tom">Tom<span class="pad-key">F</span></button>
             </div>
         </div>
+
+        </div><!-- end bottom-panel -->
     </div>
 
     <!-- Bottom Tab Bar -->
