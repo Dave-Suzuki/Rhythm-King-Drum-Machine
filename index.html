@@ -688,6 +688,21 @@
             border-color: #882200;
         }
 
+        .active-rhythm-display.latin-rhythm {
+            background: linear-gradient(180deg, #cc3333, #992222);
+            border-color: #882222;
+        }
+
+        .active-rhythm-display.american-rhythm {
+            background: linear-gradient(180deg, #cc8822, #996611);
+            border-color: #885511;
+        }
+
+        .active-rhythm-display.traditional-rhythm {
+            background: linear-gradient(180deg, #3366aa, #224488);
+            border-color: #223366;
+        }
+
         .rhythm-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -871,9 +886,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .editor-title {
@@ -940,8 +955,8 @@
 
         .pattern-slots {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
@@ -979,10 +994,10 @@
 
         .step-sequencer {
             display: grid;
-            gap: 6px;
+            gap: 4px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 10px;
+            padding: 8px 6px;
             background: rgba(0,0,0,0.7);
             border-radius: 6px;
             border: 1px solid #555;
@@ -1005,10 +1020,10 @@
 
         .sequencer-row {
             display: grid;
-            grid-template-columns: 80px repeat(16, 1fr);
-            gap: 4px;
+            grid-template-columns: 55px repeat(16, 1fr);
+            gap: 3px;
             align-items: center;
-            min-width: 600px;
+            min-width: 500px;
         }
 
         .track-label {
@@ -1243,6 +1258,14 @@
             display: block;
         }
 
+        .edit-mode.active {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100dvh - 150px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         /* Bottom Tab Bar */
         .mode-tabs {
             position: fixed;
@@ -1289,15 +1312,17 @@
             background: rgba(0,0,0,0.1);
         }
 
-        /* Pads mode: maximize pad area */
+        /* Pads mode: maximize pad area but fit on screen */
         .pads-mode .drum-pads {
-            min-height: calc(100dvh - 200px);
-            gap: 8px;
+            gap: 6px;
+            height: calc(100dvh - 200px);
+            grid-template-rows: repeat(4, 1fr);
         }
 
         .pads-mode .drum-pad {
             min-height: 0;
             font-size: 1em;
+            height: 100%;
         }
 
         /* Mini transport for pads mode */
@@ -1343,6 +1368,21 @@
             font-size: 0.7em;
             color: #666;
             text-transform: uppercase;
+        }
+
+        .transport-mini .tap-btn-mini {
+            padding: 8px 12px;
+            background: linear-gradient(180deg, #666, #444);
+            color: #ddd;
+            border: 2px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7em;
+            min-height: 36px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            flex-shrink: 0;
         }
 
         /* ========== RESPONSIVE ========== */
@@ -1411,18 +1451,19 @@
             }
 
             .sequencer-row {
-                min-width: 420px;
-                grid-template-columns: 40px repeat(16, minmax(20px, 1fr));
+                min-width: 360px;
+                grid-template-columns: 32px repeat(16, minmax(16px, 1fr));
                 gap: 2px;
             }
 
             .track-label {
-                font-size: 0.6em;
-                padding: 4px 2px;
+                font-size: 0.55em;
+                padding: 3px 1px;
             }
 
             .step-button {
-                min-height: 30px;
+                min-height: 24px;
+                aspect-ratio: auto;
             }
 
             .pattern-btn {
@@ -1454,7 +1495,7 @@
             }
 
             .pads-mode .drum-pads {
-                min-height: calc(100dvh - 180px);
+                height: calc(100dvh - 170px);
             }
         }
 
@@ -1469,11 +1510,11 @@
             .rhythm-btn { font-size: 0.6em; padding: 8px 3px; min-height: 38px; }
 
             .sequencer-row {
-                min-width: 380px;
-                grid-template-columns: 35px repeat(16, minmax(18px, 1fr));
+                min-width: 340px;
+                grid-template-columns: 28px repeat(16, minmax(14px, 1fr));
             }
 
-            .step-button { min-height: 26px; }
+            .step-button { min-height: 22px; aspect-ratio: auto; }
 
             .slide-menu { width: 90vw; right: -90vw; }
         }
@@ -1484,8 +1525,8 @@
             .controls-row { flex-wrap: wrap; }
             .rhythm-buttons { grid-template-columns: repeat(2, 1fr); }
             .sequencer-row {
-                min-width: 340px;
-                grid-template-columns: 30px repeat(16, minmax(16px, 1fr));
+                min-width: 310px;
+                grid-template-columns: 26px repeat(16, minmax(12px, 1fr));
             }
         }
 
@@ -1519,7 +1560,8 @@
 
             .pads-mode .drum-pads {
                 grid-template-columns: repeat(4, 1fr);
-                min-height: calc(100dvh - 140px);
+                height: calc(100dvh - 130px);
+                grid-template-rows: repeat(2, 1fr);
             }
         }
     </style>
@@ -1705,6 +1747,17 @@
                     No rhythm selected
                 </div>
             </div>
+
+            <div class="edit-pads play-pads">
+                <button class="edit-pad" data-drum="kick1">K1</button>
+                <button class="edit-pad" data-drum="kick2">K2</button>
+                <button class="edit-pad" data-drum="snare1">SN</button>
+                <button class="edit-pad" data-drum="clap">CL</button>
+                <button class="edit-pad" data-drum="hihat1">H1</button>
+                <button class="edit-pad" data-drum="hihat2">H2</button>
+                <button class="edit-pad" data-drum="cymbal">CY</button>
+                <button class="edit-pad" data-drum="tom">TM</button>
+            </div>
         </div>
 
         <!-- MODE 2: EDIT -->
@@ -1713,6 +1766,7 @@
                 <button class="play-btn-mini" id="playBtnEdit">Play</button>
                 <span class="mini-tempo" id="editTempo">120 BPM</span>
                 <span class="mini-rhythm" id="editRhythm"></span>
+                <button class="tap-btn-mini" id="tapBtnEdit">Tap</button>
             </div>
 
             <div class="pattern-editor">
@@ -1752,6 +1806,7 @@
                 <button class="play-btn-mini" id="playBtnMini">Play</button>
                 <span class="mini-tempo" id="miniTempo">120 BPM</span>
                 <span class="mini-rhythm" id="miniRhythm"></span>
+                <button class="tap-btn-mini" id="tapBtnMini">Tap</button>
             </div>
             <div class="drum-pads">
                 <button class="drum-pad" data-drum="kick1">Kick 1<span class="pad-key">Q</span></button>
@@ -2810,6 +2865,8 @@
     document.getElementById('playBtnEdit').addEventListener('click', function() {
         togglePlay();
     });
+    document.getElementById('tapBtnEdit').addEventListener('click', tapTempo);
+    document.getElementById('tapBtnMini').addEventListener('click', tapTempo);
 
     // Edit mode compact pads
     document.querySelectorAll('.edit-pad').forEach(function(pad) {
@@ -2860,6 +2917,18 @@
         });
     });
 
+    // Detect rhythm category
+    var latinRhythms = ['bossa-nova','samba','bolero','rumba','cha-cha','mambo','tango','paso-doble'];
+    var americanRhythms = ['slow-fox','slow-rock','swing','dixie','shuffle','go-go','discotheque'];
+    var traditionalRhythms = ['march','western','waltz'];
+
+    function getRhythmCategory(rhythm) {
+        if (latinRhythms.indexOf(rhythm) >= 0) return 'latin';
+        if (americanRhythms.indexOf(rhythm) >= 0) return 'american';
+        if (traditionalRhythms.indexOf(rhythm) >= 0) return 'traditional';
+        return '';
+    }
+
     // Update active rhythm display
     function updateActiveRhythmDisplay() {
         var display = document.getElementById('activeRhythmDisplay');
@@ -2869,7 +2938,8 @@
             display.className = 'active-rhythm-display has-rhythm';
         } else if (currentRhythm) {
             display.textContent = currentRhythm.replace(/-/g, ' ');
-            display.className = 'active-rhythm-display has-rhythm';
+            var cat = getRhythmCategory(currentRhythm);
+            display.className = 'active-rhythm-display has-rhythm' + (cat ? ' ' + cat + '-rhythm' : '');
         } else {
             display.textContent = 'No rhythm selected';
             display.className = 'active-rhythm-display';
