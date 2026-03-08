@@ -1472,11 +1472,29 @@
             .transport-half {
                 width: 100%;
                 order: 1;
+                flex-wrap: wrap;
+                gap: 6px;
             }
 
             .transport-half .play-btn {
                 padding: 10px 14px;
                 min-width: 56px;
+            }
+
+            .transport-half .visualizer {
+                flex: 1;
+                min-width: 60px;
+                height: 40px;
+                min-height: 40px;
+            }
+
+            .transport-half .tempo-tap-group {
+                flex-shrink: 0;
+            }
+
+            .transport-half .tap-tempo-btn {
+                padding: 10px 12px;
+                min-width: 48px;
             }
 
             .bar-divider {
@@ -1624,6 +1642,7 @@
         @media (min-width: 769px) {
             body {
                 padding-bottom: 10px;
+                align-items: center;
             }
 
             .mode-tabs {
@@ -1918,10 +1937,10 @@
         </div>
 
         <!-- MODE 2: EDIT -->
-        <button class="section-toggle" data-section="editMode">
+        <button class="section-toggle collapsed" data-section="editMode">
             <span class="section-arrow">&#9662;</span> Pattern Editor
         </button>
-        <div class="mode-panel edit-mode" id="editMode">
+        <div class="mode-panel edit-mode section-hidden" id="editMode">
             <div class="pattern-editor">
                 <div class="editor-header">
                     <div>
@@ -1954,10 +1973,10 @@
         </div>
 
         <!-- MODE 3: PADS (Live Play) -->
-        <button class="section-toggle" data-section="padsMode" id="padsSectionToggle">
+        <button class="section-toggle collapsed" data-section="padsMode" id="padsSectionToggle">
             <span class="section-arrow">&#9662;</span> Drum Pads
         </button>
-        <div class="mode-panel pads-mode" id="padsMode">
+        <div class="mode-panel pads-mode section-hidden" id="padsMode">
             <div class="drum-pads">
                 <button class="drum-pad" data-drum="kick1">Kick 1<span class="pad-key">Q</span></button>
                 <button class="drum-pad" data-drum="kick2">Kick 2<span class="pad-key">W</span></button>
