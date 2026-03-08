@@ -430,15 +430,67 @@
             transform: translateY(1px);
         }
 
-        .controls-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 12px;
-            padding: 12px;
+        /* Compact play top bar: [Play] [visualizer+tempo] [Tap] */
+        .play-top-bar {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+            margin-bottom: 8px;
+        }
+
+        .play-top-bar .play-btn {
+            padding: 10px 16px;
+            min-width: 60px;
+            flex-shrink: 0;
+        }
+
+        .play-top-bar .tap-tempo-btn {
+            padding: 10px 12px;
+            min-width: 48px;
+            flex-shrink: 0;
+            font-size: 0.75em;
+        }
+
+        .play-top-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .play-top-info .tempo-display {
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .play-top-info .visualizer {
+            flex: 1;
+            min-height: 30px;
+            margin: 0;
+            height: auto;
+        }
+
+        /* Compact single-row controls */
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 6px 8px;
             background: rgba(0,0,0,0.08);
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid rgba(0,0,0,0.1);
+            align-items: center;
+        }
+
+        .controls-row .control-group {
+            flex: 1;
+            min-width: 0;
+            text-align: center;
+        }
+
+        .controls-row .slider {
+            margin-top: 4px;
         }
 
         .control-group {
@@ -547,21 +599,93 @@
         }
 
         .rhythm-section {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .rhythm-category {
-            margin-bottom: 10px;
+            margin-bottom: 4px;
         }
 
-        .category-title {
+        /* Accordion toggle header */
+        .category-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 5px;
+            cursor: pointer;
             font-size: 0.7em;
-            color: #555;
+            color: #444;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-            padding-left: 4px;
+            letter-spacing: 1.5px;
             font-weight: 700;
+            text-align: left;
+            transition: all 0.15s;
+        }
+
+        .category-toggle:active {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .category-toggle.open {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-color: transparent;
+        }
+
+        .category-toggle.open .category-arrow {
+            transform: rotate(180deg);
+        }
+
+        .category-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .latin-dot { background: #cc3333; }
+        .american-dot { background: #cc8822; }
+        .traditional-dot { background: #3366aa; }
+
+        .category-arrow {
+            margin-left: auto;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+
+        .rhythm-buttons.open {
+            display: grid !important;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            padding: 6px;
+            margin-bottom: 4px;
+            background: rgba(0,0,0,0.03);
+        }
+
+        /* Active rhythm display chip */
+        .active-rhythm-display {
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 5px;
+            font-size: 0.75em;
+            color: #666;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .active-rhythm-display.has-rhythm {
+            color: #fff;
+            background: linear-gradient(180deg, #cc3300, #aa2200);
+            border-color: #882200;
         }
 
         .rhythm-buttons {
@@ -1074,6 +1198,42 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Edit mode compact pads */
+        .edit-pads {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 6px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .edit-pad {
+            flex: 1;
+            padding: 10px 2px;
+            background: linear-gradient(180deg, #444, #2a2a2a);
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #bbb;
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: center;
+            min-height: 38px;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: all 0.08s;
+        }
+
+        .edit-pad:active, .edit-pad.active {
+            transform: translateY(1px);
+            background: linear-gradient(180deg, #555, #3a3a3a);
+            border-color: #cc3300;
+            color: #ff6644;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 2px 3px rgba(0,0,0,0.3);
+        }
+
         /* ========== 3-MODE TAB SYSTEM ========== */
         .mode-panel {
             display: none;
@@ -1218,10 +1378,9 @@
                 font-size: 0.65em;
             }
 
-            .controls-section {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                padding: 8px;
+            .controls-row {
+                gap: 4px;
+                padding: 4px 6px;
             }
 
             .slider::-webkit-slider-thumb {
@@ -1322,7 +1481,7 @@
         /* Very small phones */
         @media (max-width: 320px) {
             .machine-title { font-size: 0.9em; }
-            .controls-section { grid-template-columns: 1fr; }
+            .controls-row { flex-wrap: wrap; }
             .rhythm-buttons { grid-template-columns: repeat(2, 1fr); }
             .sequencer-row {
                 min-width: 340px;
@@ -1349,7 +1508,7 @@
             .drum-machine { padding: 8px 12px; }
             .machine-header { margin-bottom: 4px; padding: 4px 36px; }
             .machine-title { font-size: 1em; }
-            .controls-section { grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px; }
+            .controls-row { gap: 4px; padding: 4px 6px; }
             .visualizer { height: 30px; margin: 4px 0; }
             .transport-controls { margin-bottom: 6px; }
             .transport-btn { padding: 8px 16px; }
@@ -1462,41 +1621,45 @@
 
         <!-- MODE 1: PLAY (default) -->
         <div class="mode-panel play-mode active" id="playMode">
-            <div class="controls-section">
+            <div class="play-top-bar">
+                <button class="transport-btn play-btn" id="playBtn">Play</button>
+                <div class="play-top-info">
+                    <div class="tempo-display" id="tempoDisplay">120 BPM</div>
+                    <div class="visualizer" id="visualizer">
+                        <canvas id="waveformCanvas"></canvas>
+                        <div class="beat-overlay" id="beatOverlay"></div>
+                    </div>
+                </div>
+                <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">Tap</button>
+            </div>
+
+            <div class="controls-row">
                 <div class="control-group">
-                    <label class="control-label">Volume</label>
+                    <label class="control-label">Vol</label>
                     <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="70">
                 </div>
                 <div class="control-group">
-                    <label class="control-label">Balance</label>
+                    <label class="control-label">Bal</label>
                     <input type="range" class="slider" id="balanceSlider" min="0" max="100" value="50">
                 </div>
                 <div class="control-group">
                     <label class="control-label">Speed</label>
                     <input type="range" class="slider" id="tempoSlider" min="60" max="200" value="120">
-                    <div class="tempo-display" id="tempoDisplay">120 BPM</div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label">Swing</label>
+                    <label class="control-label">Swing <span id="swingDisplay" style="font-size:0.9em">0%</span></label>
                     <input type="range" class="slider" id="swingSlider" min="0" max="100" value="0">
-                    <div class="swing-display" id="swingDisplay">0%</div>
                 </div>
-            </div>
-
-            <div class="visualizer" id="visualizer">
-                <canvas id="waveformCanvas"></canvas>
-                <div class="beat-overlay" id="beatOverlay"></div>
-            </div>
-
-            <div class="transport-controls">
-                <button class="transport-btn play-btn" id="playBtn">Play</button>
-                <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">Tap Tempo</button>
             </div>
 
             <div class="rhythm-section">
                 <div class="rhythm-category">
-                    <div class="category-title">Latin American</div>
-                    <div class="rhythm-buttons">
+                    <button class="category-toggle" data-category="latin">
+                        <span class="category-dot latin-dot"></span>
+                        Latin American
+                        <span class="category-arrow">&#9662;</span>
+                    </button>
+                    <div class="rhythm-buttons" id="latinButtons" style="display:none">
                         <button class="rhythm-btn latin-btn" data-rhythm="bossa-nova">Bossa Nova</button>
                         <button class="rhythm-btn latin-btn" data-rhythm="samba">Samba</button>
                         <button class="rhythm-btn latin-btn" data-rhythm="bolero">Bolero</button>
@@ -1509,8 +1672,12 @@
                 </div>
 
                 <div class="rhythm-category">
-                    <div class="category-title">American</div>
-                    <div class="rhythm-buttons">
+                    <button class="category-toggle" data-category="american">
+                        <span class="category-dot american-dot"></span>
+                        American
+                        <span class="category-arrow">&#9662;</span>
+                    </button>
+                    <div class="rhythm-buttons" id="americanButtons" style="display:none">
                         <button class="rhythm-btn american-btn" data-rhythm="slow-fox">Slow Fox</button>
                         <button class="rhythm-btn american-btn" data-rhythm="slow-rock">Slow Rock</button>
                         <button class="rhythm-btn american-btn" data-rhythm="swing">Swing</button>
@@ -1522,18 +1689,32 @@
                 </div>
 
                 <div class="rhythm-category">
-                    <div class="category-title">Traditional</div>
-                    <div class="rhythm-buttons">
+                    <button class="category-toggle" data-category="traditional">
+                        <span class="category-dot traditional-dot"></span>
+                        Traditional
+                        <span class="category-arrow">&#9662;</span>
+                    </button>
+                    <div class="rhythm-buttons" id="traditionalButtons" style="display:none">
                         <button class="rhythm-btn traditional-btn" data-rhythm="march">March/Polka</button>
                         <button class="rhythm-btn traditional-btn" data-rhythm="western">Western</button>
                         <button class="rhythm-btn traditional-btn" data-rhythm="waltz">Waltz</button>
                     </div>
+                </div>
+
+                <div class="active-rhythm-display" id="activeRhythmDisplay">
+                    No rhythm selected
                 </div>
             </div>
         </div>
 
         <!-- MODE 2: EDIT -->
         <div class="mode-panel edit-mode" id="editMode">
+            <div class="transport-mini">
+                <button class="play-btn-mini" id="playBtnEdit">Play</button>
+                <span class="mini-tempo" id="editTempo">120 BPM</span>
+                <span class="mini-rhythm" id="editRhythm"></span>
+            </div>
+
             <div class="pattern-editor">
                 <div class="editor-header">
                     <div>
@@ -1550,12 +1731,18 @@
 
                 <div class="pattern-slots" id="patternSlots"></div>
 
-                <div class="pattern-info">
-                    <strong>Tap steps</strong> to build patterns | <strong>Copy/Paste:</strong> Duplicate between slots<br>
-                    <strong>Keys:</strong> Space (play), 1-8 (slots), ? (shortcuts)
-                </div>
-
                 <div class="step-sequencer" id="stepSequencer"></div>
+            </div>
+
+            <div class="edit-pads">
+                <button class="edit-pad" data-drum="kick1">K1</button>
+                <button class="edit-pad" data-drum="kick2">K2</button>
+                <button class="edit-pad" data-drum="snare1">SN</button>
+                <button class="edit-pad" data-drum="clap">CL</button>
+                <button class="edit-pad" data-drum="hihat1">H1</button>
+                <button class="edit-pad" data-drum="hihat2">H2</button>
+                <button class="edit-pad" data-drum="cymbal">CY</button>
+                <button class="edit-pad" data-drum="tom">TM</button>
             </div>
         </div>
 
@@ -2434,6 +2621,7 @@
     document.querySelectorAll('.rhythm-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
+            initAudio();
             document.querySelectorAll('.rhythm-btn').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             currentRhythm = btn.dataset.rhythm;
@@ -2441,6 +2629,10 @@
             document.querySelectorAll('.pattern-slot').forEach(function(slot) {
                 slot.classList.remove('active');
             });
+            updateActiveRhythmDisplay();
+            updateMiniTransport();
+            // Auto-play on rhythm selection
+            if (!isPlaying) togglePlay();
         });
     });
 
@@ -2548,10 +2740,10 @@
         currentMode = mode;
 
         if (mode === 'edit') {
-            // Auto-enable edit mode
+            // Auto-enable edit mode but don't override active rhythm
             if (!editMode) toggleEditMode();
-            if (!isCustomPattern) selectPatternSlot(currentPatternSlot);
             renderSequencer();
+            updateEditTransport();
         } else if (mode === 'play') {
             // Sync visualizer canvas size
             var canvas = document.getElementById('waveformCanvas');
@@ -2568,6 +2760,7 @@
     }
 
     function updateMiniTransport() {
+        // Update pads mode transport
         var miniBtn = document.getElementById('playBtnMini');
         if (miniBtn) {
             miniBtn.textContent = isPlaying ? 'Stop' : 'Play';
@@ -2582,6 +2775,25 @@
             else if (currentRhythm) miniRhythm.textContent = currentRhythm.replace(/-/g, ' ');
             else miniRhythm.textContent = '';
         }
+        // Also update edit mode transport
+        updateEditTransport();
+    }
+
+    function updateEditTransport() {
+        var editBtn = document.getElementById('playBtnEdit');
+        if (editBtn) {
+            editBtn.textContent = isPlaying ? 'Stop' : 'Play';
+            if (isPlaying) editBtn.classList.add('playing');
+            else editBtn.classList.remove('playing');
+        }
+        var editTempo = document.getElementById('editTempo');
+        if (editTempo) editTempo.textContent = tempo + ' BPM';
+        var editRhythm = document.getElementById('editRhythm');
+        if (editRhythm) {
+            if (isCustomPattern) editRhythm.textContent = 'P' + (currentPatternSlot + 1);
+            else if (currentRhythm) editRhythm.textContent = currentRhythm.replace(/-/g, ' ');
+            else editRhythm.textContent = '';
+        }
     }
 
     // Tab click handlers
@@ -2591,16 +2803,84 @@
         });
     });
 
-    // Mini play button
+    // Mini play buttons (pads + edit modes)
     document.getElementById('playBtnMini').addEventListener('click', function() {
         togglePlay();
-        updateMiniTransport();
     });
+    document.getElementById('playBtnEdit').addEventListener('click', function() {
+        togglePlay();
+    });
+
+    // Edit mode compact pads
+    document.querySelectorAll('.edit-pad').forEach(function(pad) {
+        function triggerEditPad(e) {
+            e.preventDefault();
+            initAudio();
+            if (!drumSynth) {
+                drumSynth = new AnalogDrumSynth(audioContext);
+                drumSynth.setVolume(volume);
+            }
+            var drum = pad.dataset.drum;
+            var time = audioContext.currentTime;
+            pad.classList.add('active');
+            switch(drum) {
+                case 'kick1': drumSynth.kick(time, 1); break;
+                case 'kick2': drumSynth.kick(time, 2); break;
+                case 'snare1': drumSynth.snare(time); break;
+                case 'clap': drumSynth.clap(time); break;
+                case 'hihat1': drumSynth.hihat(time, false); break;
+                case 'hihat2': drumSynth.hihat(time, true); break;
+                case 'cymbal': drumSynth.cymbal(time); break;
+                case 'tom': drumSynth.tom(time); break;
+            }
+        }
+        function releaseEditPad() { pad.classList.remove('active'); }
+        pad.addEventListener('mousedown', triggerEditPad);
+        pad.addEventListener('mouseup', releaseEditPad);
+        pad.addEventListener('mouseleave', releaseEditPad);
+        pad.addEventListener('touchstart', function(e) { e.preventDefault(); triggerEditPad(e); });
+        pad.addEventListener('touchend', function(e) { e.preventDefault(); releaseEditPad(); });
+        pad.addEventListener('touchcancel', releaseEditPad);
+    });
+
+    // Rhythm category accordion toggles
+    document.querySelectorAll('.category-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            var isOpen = toggle.classList.contains('open');
+            // Close all categories first
+            document.querySelectorAll('.category-toggle').forEach(function(t) { t.classList.remove('open'); });
+            document.querySelectorAll('.rhythm-buttons').forEach(function(b) { b.classList.remove('open'); b.style.display = 'none'; });
+            // Open clicked one if it wasn't already open
+            if (!isOpen) {
+                toggle.classList.add('open');
+                var buttons = toggle.nextElementSibling;
+                buttons.style.display = '';
+                buttons.classList.add('open');
+            }
+        });
+    });
+
+    // Update active rhythm display
+    function updateActiveRhythmDisplay() {
+        var display = document.getElementById('activeRhythmDisplay');
+        if (!display) return;
+        if (isCustomPattern) {
+            display.textContent = 'Pattern ' + (currentPatternSlot + 1);
+            display.className = 'active-rhythm-display has-rhythm';
+        } else if (currentRhythm) {
+            display.textContent = currentRhythm.replace(/-/g, ' ');
+            display.className = 'active-rhythm-display has-rhythm';
+        } else {
+            display.textContent = 'No rhythm selected';
+            display.className = 'active-rhythm-display';
+        }
+    }
 
     // Initialize
     initVisualizer();
     initPatternEditor();
     loadProjectsFromStorage();
+    updateActiveRhythmDisplay();
 
     // Menu Management
     function toggleMenu() {
@@ -3256,6 +3536,8 @@
         if (editMode) {
             document.getElementById('editModeIndicator').style.display = 'inline-block';
         }
+        updateActiveRhythmDisplay();
+        updateMiniTransport();
     }
 
     function toggleEditMode() {
