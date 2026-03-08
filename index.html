@@ -2162,8 +2162,9 @@
         }
 
         clap(time) {
-            var clapCount = 3;
-            var clapSpacing = 0.007;
+            // Multi-hit clap with tight spacing for snappy attack
+            var clapCount = 4;
+            var clapSpacing = 0.004;
 
             for (var i = 0; i < clapCount; i++) {
                 var startTime = time + (i * clapSpacing);
@@ -2171,86 +2172,55 @@
                 var noise = this.context.createBufferSource();
                 var noiseBuffer = this.context.createBuffer(1, 512, this.context.sampleRate);
                 var data = noiseBuffer.getChannelData(0);
-
                 for (var j = 0; j < 512; j++) {
                     data[j] = Math.random() * 2 - 1;
                 }
-
                 noise.buffer = noiseBuffer;
 
                 var filter = this.context.createBiquadFilter();
                 filter.type = 'bandpass';
-                filter.frequency.value = 1500 + (i * 300);
-                filter.Q.value = 2;
-
-                var highpass = this.context.createBiquadFilter();
-                highpass.type = 'highpass';
-                highpass.frequency.value = 1000;
-                highpass.Q.value = 1;
+                filter.frequency.value = 2000 + (i * 400);
+                filter.Q.value = 1.5;
 
                 var gain = this.context.createGain();
-                var attackTime = 0.001;
-                var decayTime = i === clapCount - 1 ? 0.02 : 0.008;
-                var vol = i === clapCount - 1 ? 0.5 : 0.2;
+                var isLast = i === clapCount - 1;
+                var vol = isLast ? 0.6 : 0.3;
+                var decay = isLast ? 0.04 : 0.005;
 
-                gain.gain.setValueAtTime(0, startTime);
-                gain.gain.linearRampToValueAtTime(vol, startTime + attackTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + attackTime + decayTime);
+                gain.gain.setValueAtTime(vol, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + decay);
 
                 noise.connect(filter);
-                filter.connect(highpass);
-                highpass.connect(gain);
+                filter.connect(gain);
                 gain.connect(this.masterGain);
 
                 noise.start(startTime);
-                noise.stop(startTime + attackTime + decayTime);
+                noise.stop(startTime + decay);
             }
 
-            var click = this.context.createOscillator();
-            var clickGain = this.context.createGain();
-            var clickFilter = this.context.createBiquadFilter();
-
-            click.type = 'square';
-            click.frequency.value = 2500;
-
-            clickFilter.type = 'highpass';
-            clickFilter.frequency.value = 2000;
-            clickFilter.Q.value = 2;
-
-            clickGain.gain.setValueAtTime(0.1, time);
-            clickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.003);
-
-            click.connect(clickFilter);
-            clickFilter.connect(clickGain);
-            clickGain.connect(this.masterGain);
-
-            click.start(time);
-            click.stop(time + 0.003);
-
-            var snapNoise = this.context.createBufferSource();
+            // Sharp transient snap
+            var snap = this.context.createBufferSource();
             var snapBuffer = this.context.createBuffer(1, 256, this.context.sampleRate);
             var snapData = snapBuffer.getChannelData(0);
-
             for (var k = 0; k < 256; k++) {
                 snapData[k] = Math.random() * 2 - 1;
             }
-
-            snapNoise.buffer = snapBuffer;
+            snap.buffer = snapBuffer;
 
             var snapFilter = this.context.createBiquadFilter();
             snapFilter.type = 'highpass';
-            snapFilter.frequency.value = 3000;
+            snapFilter.frequency.value = 4000;
 
             var snapGain = this.context.createGain();
-            snapGain.gain.setValueAtTime(0.15, time);
-            snapGain.gain.exponentialRampToValueAtTime(0.001, time + 0.005);
+            snapGain.gain.setValueAtTime(0.25, time);
+            snapGain.gain.exponentialRampToValueAtTime(0.001, time + 0.008);
 
-            snapNoise.connect(snapFilter);
+            snap.connect(snapFilter);
             snapFilter.connect(snapGain);
             snapGain.connect(this.masterGain);
 
-            snapNoise.start(time);
-            snapNoise.stop(time + 0.005);
+            snap.start(time);
+            snap.stop(time + 0.008);
         }
 
         hihat(time, open) {
