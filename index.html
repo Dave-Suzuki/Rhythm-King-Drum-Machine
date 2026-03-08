@@ -1248,6 +1248,10 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
+        .play-pads {
+            display: none;
+        }
+
         .edit-pad {
             flex: 1;
             padding: 10px 2px;
@@ -1435,6 +1439,10 @@
 
             .play-top-bar .play-btn {
                 flex: 0;
+            }
+
+            .play-pads {
+                display: flex;
             }
 
             .rhythm-buttons {
@@ -2494,8 +2502,14 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, w, h);
 
+            // Detect audio activity from analyser data
+            var hasSignal = false;
+            for (var s = 0; s < bufferLength; s++) {
+                if (Math.abs(dataArray[s] - 128) > 2) { hasSignal = true; break; }
+            }
+
             ctx.lineWidth = 2 * (window.devicePixelRatio || 1);
-            ctx.strokeStyle = isPlaying ? '#00cc00' : '#444';
+            ctx.strokeStyle = (isPlaying || hasSignal) ? '#00cc00' : '#444';
             ctx.beginPath();
 
             var sliceWidth = w / bufferLength;
