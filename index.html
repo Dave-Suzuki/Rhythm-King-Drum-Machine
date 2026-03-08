@@ -573,22 +573,24 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: radial-gradient(circle at 38% 35%, #ccc 0%, #aaa 30%, #888 60%, #666 100%);
+            background: radial-gradient(circle at 40% 36%, #4a4a4a 0%, #3a3a3a 25%, #2a2a2a 55%, #1a1a1a 100%);
             box-shadow:
-                0 3px 8px rgba(0,0,0,0.6),
-                inset 0 2px 3px rgba(255,255,255,0.3),
-                inset 0 -1px 2px rgba(0,0,0,0.3);
-            border: 2px solid #555;
+                0 2px 6px rgba(0,0,0,0.7),
+                0 0 0 2px #555,
+                0 0 0 3px #333,
+                inset 0 1px 2px rgba(255,255,255,0.12),
+                inset 0 -1px 2px rgba(0,0,0,0.4);
+            border: 1px solid #5a5a5a;
             position: relative;
         }
 
         .knob-indicator {
             position: absolute;
-            top: 6px;
+            top: 5px;
             left: 50%;
             width: 2px;
-            height: 12px;
-            background: #222;
+            height: 10px;
+            background: #eee;
             transform-origin: bottom center;
             border-radius: 1px;
             margin-left: -1px;
@@ -1519,8 +1521,13 @@
             }
 
             .knob-wrapper {
-                width: 44px;
-                height: 44px;
+                width: 34px;
+                height: 34px;
+            }
+
+            .knob-indicator {
+                top: 4px;
+                height: 8px;
             }
 
             .edit-pads {
