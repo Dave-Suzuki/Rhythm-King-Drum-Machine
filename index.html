@@ -522,55 +522,65 @@
             text-align: center;
         }
 
-        .controls-row .slider {
-            margin-top: 4px;
-        }
-
         .control-group {
             text-align: center;
         }
 
         .control-label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 0.65em;
+            margin-bottom: 4px;
+            font-size: 0.6em;
             color: #ccc;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             font-weight: 600;
         }
 
-        .slider {
-            -webkit-appearance: none;
+        .control-group .slider {
+            display: none;
+        }
+
+        /* Rotary Knob */
+        .knob-wrapper {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .knob {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: linear-gradient(90deg, #555 0%, #777 100%);
-            outline: none;
-            margin-top: 8px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 38% 35%, #ccc 0%, #aaa 30%, #888 60%, #666 100%);
+            box-shadow:
+                0 3px 8px rgba(0,0,0,0.6),
+                inset 0 2px 3px rgba(255,255,255,0.3),
+                inset 0 -1px 2px rgba(0,0,0,0.3);
+            border: 2px solid #555;
+            position: relative;
         }
 
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #ddd, #999 60%, #777);
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
-            border: 1px solid #666;
+        .knob-indicator {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            width: 2px;
+            height: 12px;
+            background: #222;
+            transform-origin: bottom center;
+            border-radius: 1px;
+            margin-left: -1px;
         }
 
-        .slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #ddd, #999 60%, #777);
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
-            border: 1px solid #666;
+        .knob-value {
+            display: block;
+            margin-top: 3px;
+            font-size: 0.6em;
+            color: #999;
+            font-family: 'Courier New', monospace;
         }
 
         .transport-controls {
@@ -1435,8 +1445,13 @@
             }
 
             .controls-row {
-                gap: 4px;
-                padding: 4px 6px;
+                gap: 2px;
+                padding: 6px 4px;
+            }
+
+            .knob-wrapper {
+                width: 48px;
+                height: 48px;
             }
 
             .slider::-webkit-slider-thumb {
@@ -1851,19 +1866,35 @@
 
         <div class="controls-row">
             <div class="control-group">
-                <label class="control-label">Vol</label>
+                <label class="control-label">Volume</label>
+                <div class="knob-wrapper" data-slider="volumeSlider">
+                    <div class="knob"><div class="knob-indicator"></div></div>
+                </div>
+                <span class="knob-value" id="volumeValue">70</span>
                 <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="70">
             </div>
             <div class="control-group">
                 <label class="control-label">Tone</label>
+                <div class="knob-wrapper" data-slider="balanceSlider">
+                    <div class="knob"><div class="knob-indicator"></div></div>
+                </div>
+                <span class="knob-value" id="balanceValue">50</span>
                 <input type="range" class="slider" id="balanceSlider" min="0" max="100" value="50">
             </div>
             <div class="control-group">
                 <label class="control-label">Speed</label>
+                <div class="knob-wrapper" data-slider="tempoSlider">
+                    <div class="knob"><div class="knob-indicator"></div></div>
+                </div>
+                <span class="knob-value" id="tempoValue">120</span>
                 <input type="range" class="slider" id="tempoSlider" min="60" max="200" value="120">
             </div>
             <div class="control-group">
-                <label class="control-label">Swing <span id="swingDisplay" style="font-size:0.9em">0%</span></label>
+                <label class="control-label">Swing</label>
+                <div class="knob-wrapper" data-slider="swingSlider">
+                    <div class="knob"><div class="knob-indicator"></div></div>
+                </div>
+                <span class="knob-value" id="swingValue">0%</span>
                 <input type="range" class="slider" id="swingSlider" min="0" max="100" value="0">
             </div>
         </div>
@@ -2786,6 +2817,8 @@
     document.getElementById('volumeSlider').addEventListener('input', function(e) {
         volume = e.target.value / 100;
         if (drumSynth) drumSynth.setVolume(volume);
+        var vv = document.getElementById('volumeValue');
+        if (vv) vv.textContent = e.target.value;
     });
 
     // Balance control
@@ -2797,13 +2830,126 @@
     document.getElementById('tempoSlider').addEventListener('input', function(e) {
         tempo = parseInt(e.target.value);
         document.getElementById('tempoDisplay').textContent = tempo;
+        var tv = document.getElementById('tempoValue');
+        if (tv) tv.textContent = tempo;
     });
 
     // Swing control
     document.getElementById('swingSlider').addEventListener('input', function(e) {
         swing = parseInt(e.target.value);
-        document.getElementById('swingDisplay').textContent = swing + '%';
+        var sd = document.getElementById('swingDisplay');
+        if (sd) sd.textContent = swing + '%';
+        var sv = document.getElementById('swingValue');
+        if (sv) sv.textContent = swing + '%';
     });
+
+    // Rotary knob interaction
+    (function() {
+        var knobAngleRange = 270; // degrees of rotation
+        var startAngle = -135;    // min position (degrees from 12 o'clock)
+
+        function getSliderNorm(slider) {
+            return (slider.value - slider.min) / (slider.max - slider.min);
+        }
+
+        function setKnobRotation(wrapper, norm) {
+            var angle = startAngle + norm * knobAngleRange;
+            var indicator = wrapper.querySelector('.knob-indicator');
+            if (indicator) indicator.style.transform = 'rotate(' + angle + 'deg)';
+        }
+
+        function updateKnobValue(sliderId, val) {
+            if (sliderId === 'volumeSlider') {
+                var el = document.getElementById('volumeValue');
+                if (el) el.textContent = val;
+            } else if (sliderId === 'balanceSlider') {
+                var el = document.getElementById('balanceValue');
+                if (el) el.textContent = val;
+            } else if (sliderId === 'tempoSlider') {
+                var el = document.getElementById('tempoValue');
+                if (el) el.textContent = val;
+            } else if (sliderId === 'swingSlider') {
+                var el = document.getElementById('swingValue');
+                if (el) el.textContent = val + '%';
+            }
+        }
+
+        document.querySelectorAll('.knob-wrapper').forEach(function(wrapper) {
+            var sliderId = wrapper.dataset.slider;
+            var slider = document.getElementById(sliderId);
+            if (!slider) return;
+
+            // Set initial position
+            setKnobRotation(wrapper, getSliderNorm(slider));
+
+            var dragging = false;
+            var startY = 0;
+            var startVal = 0;
+            var range = slider.max - slider.min;
+
+            function onStart(e) {
+                dragging = true;
+                var pt = e.touches ? e.touches[0] : e;
+                startY = pt.clientY;
+                startVal = parseFloat(slider.value);
+                e.preventDefault();
+            }
+
+            function onMove(e) {
+                if (!dragging) return;
+                var pt = e.touches ? e.touches[0] : e;
+                var dy = startY - pt.clientY;
+                var sensitivity = range / 120;
+                var newVal = Math.round(Math.min(slider.max, Math.max(slider.min, startVal + dy * sensitivity)));
+                slider.value = newVal;
+                slider.dispatchEvent(new Event('input'));
+                setKnobRotation(wrapper, getSliderNorm(slider));
+                updateKnobValue(sliderId, newVal);
+                e.preventDefault();
+            }
+
+            function onEnd() {
+                dragging = false;
+            }
+
+            wrapper.addEventListener('mousedown', onStart);
+            wrapper.addEventListener('touchstart', onStart, {passive: false});
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('touchmove', onMove, {passive: false});
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('touchend', onEnd);
+
+            // Sync knob when slider changes programmatically
+            var observer = new MutationObserver(function() {
+                setKnobRotation(wrapper, getSliderNorm(slider));
+                updateKnobValue(sliderId, slider.value);
+            });
+
+            // Also listen for input events (from other code setting slider.value + dispatching)
+            slider.addEventListener('input', function() {
+                setKnobRotation(wrapper, getSliderNorm(slider));
+            });
+        });
+
+        // Observe programmatic .value changes via polling (for tempo sync etc)
+        setInterval(function() {
+            document.querySelectorAll('.knob-wrapper').forEach(function(wrapper) {
+                var sliderId = wrapper.dataset.slider;
+                var slider = document.getElementById(sliderId);
+                if (!slider) return;
+                var currentAngle = startAngle + getSliderNorm(slider) * knobAngleRange;
+                var indicator = wrapper.querySelector('.knob-indicator');
+                if (indicator) {
+                    var displayed = indicator.style.transform;
+                    var expected = 'rotate(' + currentAngle + 'deg)';
+                    if (displayed !== expected) {
+                        indicator.style.transform = expected;
+                        updateKnobValue(sliderId, slider.value);
+                    }
+                }
+            });
+        }, 200);
+    })();
 
     // Rhythm selection
     document.querySelectorAll('.rhythm-btn').forEach(function(btn) {
