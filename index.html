@@ -506,7 +506,7 @@
             flex: 1;
             gap: 6px;
             justify-content: center;
-            align-items: flex-start;
+            align-items: flex-end;
             min-width: 0;
         }
 
@@ -1181,21 +1181,6 @@
             color: #555;
             text-align: center;
             margin-top: 3px;
-        }
-
-        /* Groove knob sub-labels */
-        .groove-sub-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2px;
-        }
-
-        .groove-sub-label {
-            font-size: 0.38em;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
         }
 
         /* Keyboard shortcuts help */
@@ -1974,18 +1959,12 @@
                     <input type="range" class="slider" id="tempoSlider" min="60" max="200" value="120">
                 </div>
                 <div class="control-group">
-                    <label class="control-label">Swing</label>
                     <div class="knob-wrapper" data-slider="swingSlider">
                         <div class="knob"><div class="knob-indicator"></div></div>
                     </div>
                     <input type="range" class="slider" id="swingSlider" min="0" max="100" value="0">
                 </div>
-                <div class="control-group groove-control">
-                    <label class="control-label">Groove</label>
-                    <div class="groove-sub-labels">
-                        <span class="groove-sub-label">LAID BACK</span>
-                        <span class="groove-sub-label">ON TOP</span>
-                    </div>
+                <div class="control-group">
                     <div class="knob-wrapper" data-slider="grooveSlider">
                         <div class="knob"><div class="knob-indicator"></div></div>
                     </div>
