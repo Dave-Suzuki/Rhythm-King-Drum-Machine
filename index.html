@@ -994,10 +994,8 @@
 
         .step-sequencer {
             display: grid;
-            gap: 4px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 8px 6px;
+            gap: 3px;
+            padding: 6px 4px;
             background: rgba(0,0,0,0.7);
             border-radius: 6px;
             border: 1px solid #555;
@@ -1020,10 +1018,9 @@
 
         .sequencer-row {
             display: grid;
-            grid-template-columns: 55px repeat(16, 1fr);
-            gap: 3px;
+            grid-template-columns: 50px repeat(16, 1fr);
+            gap: 2px;
             align-items: center;
-            min-width: 500px;
         }
 
         .track-label {
@@ -1036,17 +1033,18 @@
             text-align: center;
             white-space: nowrap;
             font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .step-button {
-            aspect-ratio: 1;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: 3px;
             cursor: pointer;
             transition: all 0.08s;
             position: relative;
-            min-height: 28px;
+            min-height: 24px;
         }
 
         .step-button:hover {
@@ -1249,21 +1247,46 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 2px 3px rgba(0,0,0,0.3);
         }
 
-        /* ========== 3-MODE TAB SYSTEM ========== */
+        /* ========== SECTION TOGGLES (desktop only) ========== */
+        .section-toggle {
+            display: none; /* hidden on mobile, shown on desktop */
+            width: 100%;
+            padding: 8px 12px;
+            background: linear-gradient(180deg, #b0b0b8, #909098);
+            border: 1px solid rgba(0,0,0,0.15);
+            border-radius: 5px;
+            color: #333;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-align: left;
+            margin-top: 8px;
+            transition: all 0.15s;
+        }
+
+        .section-toggle:hover {
+            background: linear-gradient(180deg, #c0c0c8, #a0a0a8);
+        }
+
+        .section-toggle .section-arrow {
+            display: inline-block;
+            transition: transform 0.2s;
+            margin-right: 4px;
+        }
+
+        .section-toggle.collapsed .section-arrow {
+            transform: rotate(-90deg);
+        }
+
+        /* ========== 3-MODE TAB SYSTEM (mobile) ========== */
         .mode-panel {
             display: none;
         }
 
         .mode-panel.active {
             display: block;
-        }
-
-        .edit-mode.active {
-            display: flex;
-            flex-direction: column;
-            max-height: calc(100dvh - 150px);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         /* Bottom Tab Bar */
@@ -1324,66 +1347,6 @@
             font-size: 1em;
             height: 100%;
             overflow: hidden;
-        }
-
-        /* Mini transport for pads mode */
-        .transport-mini {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            background: rgba(0,0,0,0.08);
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .transport-mini .play-btn-mini {
-            padding: 8px 20px;
-            background: linear-gradient(180deg, #449944, #336633);
-            color: white;
-            border: 2px solid #2a5a2a;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.8em;
-            min-height: 36px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-
-        .transport-mini .play-btn-mini.playing {
-            background: linear-gradient(180deg, #cc3333, #aa2222);
-            border-color: #882222;
-        }
-
-        .transport-mini .mini-tempo {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .transport-mini .mini-rhythm {
-            margin-left: auto;
-            font-size: 0.7em;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        .transport-mini .tap-btn-mini {
-            padding: 8px 12px;
-            background: linear-gradient(180deg, #666, #444);
-            color: #ddd;
-            border: 2px solid #555;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.7em;
-            min-height: 36px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-            flex-shrink: 0;
         }
 
         /* ========== RESPONSIVE ========== */
@@ -1452,19 +1415,17 @@
             }
 
             .sequencer-row {
-                min-width: 360px;
-                grid-template-columns: 32px repeat(16, minmax(16px, 1fr));
-                gap: 2px;
+                grid-template-columns: 28px repeat(16, 1fr);
+                gap: 1px;
             }
 
             .track-label {
-                font-size: 0.55em;
+                font-size: 0.5em;
                 padding: 3px 1px;
             }
 
             .step-button {
-                min-height: 24px;
-                aspect-ratio: auto;
+                min-height: 20px;
             }
 
             .pattern-btn {
@@ -1511,11 +1472,10 @@
             .rhythm-btn { font-size: 0.6em; padding: 8px 3px; min-height: 38px; }
 
             .sequencer-row {
-                min-width: 340px;
-                grid-template-columns: 28px repeat(16, minmax(14px, 1fr));
+                grid-template-columns: 24px repeat(16, 1fr);
             }
 
-            .step-button { min-height: 22px; aspect-ratio: auto; }
+            .step-button { min-height: 18px; }
 
             .slide-menu { width: 90vw; right: -90vw; }
         }
@@ -1526,8 +1486,7 @@
             .controls-row { flex-wrap: wrap; }
             .rhythm-buttons { grid-template-columns: repeat(2, 1fr); }
             .sequencer-row {
-                min-width: 310px;
-                grid-template-columns: 26px repeat(16, minmax(12px, 1fr));
+                grid-template-columns: 20px repeat(16, 1fr);
             }
         }
 
@@ -1563,6 +1522,71 @@
                 grid-template-columns: repeat(4, 1fr);
                 height: calc(100dvh - 180px);
                 grid-template-rows: repeat(2, 1fr);
+            }
+        }
+
+        /* ========== DESKTOP: Continuous layout ========== */
+        @media (min-width: 769px) {
+            body {
+                padding-bottom: 10px;
+            }
+
+            .mode-tabs {
+                display: none;
+            }
+
+            .section-toggle {
+                display: block;
+            }
+
+            /* Show all panels regardless of .active */
+            .mode-panel {
+                display: block !important;
+            }
+
+            .edit-mode {
+                max-height: none !important;
+                overflow-y: visible !important;
+            }
+
+            /* Pads: horizontal compact row on desktop */
+            .pads-mode .drum-pads {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(2, auto);
+                height: auto;
+                gap: 8px;
+            }
+
+            .pads-mode .drum-pad {
+                min-height: 60px;
+                height: auto;
+            }
+
+            /* Collapsed section: hide the panel */
+            .mode-panel.section-hidden {
+                display: none !important;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Bigger visualizer on desktop */
+            .play-top-info .visualizer {
+                min-height: 50px;
+            }
+
+            /* Wider sequencer on desktop */
+            .sequencer-row {
+                grid-template-columns: 80px repeat(16, 1fr);
+                gap: 4px;
+            }
+
+            .track-label {
+                font-size: 0.75em;
+                padding: 6px 4px;
+            }
+
+            .step-button {
+                min-height: 32px;
             }
         }
     </style>
@@ -1676,6 +1700,9 @@
         </div>
 
         <!-- MODE 1: PLAY (default) -->
+        <button class="section-toggle" data-section="playMode">
+            <span class="section-arrow">&#9662;</span> Rhythm Selector
+        </button>
         <div class="mode-panel play-mode active" id="playMode">
 
             <div class="controls-row">
@@ -1764,6 +1791,9 @@
         </div>
 
         <!-- MODE 2: EDIT -->
+        <button class="section-toggle" data-section="editMode">
+            <span class="section-arrow">&#9662;</span> Pattern Editor
+        </button>
         <div class="mode-panel edit-mode" id="editMode">
             <div class="pattern-editor">
                 <div class="editor-header">
@@ -1797,6 +1827,9 @@
         </div>
 
         <!-- MODE 3: PADS (Live Play) -->
+        <button class="section-toggle" data-section="padsMode">
+            <span class="section-arrow">&#9662;</span> Drum Pads
+        </button>
         <div class="mode-panel pads-mode" id="padsMode">
             <div class="drum-pads">
                 <button class="drum-pad" data-drum="kick1">Kick 1<span class="pad-key">Q</span></button>
@@ -2831,6 +2864,23 @@
         });
     });
 
+    // Section toggle handlers (desktop collapsible sections)
+    document.querySelectorAll('.section-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            var sectionId = toggle.dataset.section;
+            var panel = document.getElementById(sectionId);
+            if (!panel) return;
+            var isCollapsed = toggle.classList.contains('collapsed');
+            if (isCollapsed) {
+                toggle.classList.remove('collapsed');
+                panel.classList.remove('section-hidden');
+            } else {
+                toggle.classList.add('collapsed');
+                panel.classList.add('section-hidden');
+            }
+        });
+    });
+
     // Edit mode compact pads
     document.querySelectorAll('.edit-pad').forEach(function(pad) {
         function triggerEditPad(e) {
@@ -2914,6 +2964,22 @@
     initPatternEditor();
     loadProjectsFromStorage();
     updateActiveRhythmDisplay();
+
+    // On desktop, auto-enable edit mode since all panels are visible
+    if (window.innerWidth >= 769) {
+        if (!editMode) {
+            editMode = true;
+            var indicator = document.getElementById('editModeIndicator');
+            if (indicator) indicator.style.display = 'inline-block';
+            var cpBtn = document.getElementById('copyPasteBtn');
+            var clBtn = document.getElementById('clearPatternBtn');
+            var rBtn = document.getElementById('randomizeBtn');
+            if (cpBtn) cpBtn.disabled = false;
+            if (clBtn) clBtn.disabled = false;
+            if (rBtn) rBtn.disabled = false;
+        }
+        renderSequencer();
+    }
 
     // Menu Management
     function toggleMenu() {
@@ -3449,15 +3515,16 @@
             customPatterns[currentPatternSlot] = { name: 'Pattern ' + (currentPatternSlot + 1), pattern: createEmptyPattern(), hasData: false };
         }
 
+        var isMobile = window.innerWidth < 769;
         var tracks = [
-            { id: 'kick', label: 'Kick 1' },
-            { id: 'kick2', label: 'Kick 2' },
-            { id: 'snare', label: 'Snare' },
-            { id: 'clap', label: 'Clap' },
-            { id: 'hihat', label: 'HiHat 1' },
-            { id: 'hihat2', label: 'HiHat 2' },
-            { id: 'cymbal', label: 'Cymbal' },
-            { id: 'tom', label: 'Tom' }
+            { id: 'kick', label: 'Kick 1', short: 'K1' },
+            { id: 'kick2', label: 'Kick 2', short: 'K2' },
+            { id: 'snare', label: 'Snare', short: 'SN' },
+            { id: 'clap', label: 'Clap', short: 'CL' },
+            { id: 'hihat', label: 'HiHat 1', short: 'H1' },
+            { id: 'hihat2', label: 'HiHat 2', short: 'H2' },
+            { id: 'cymbal', label: 'Cymbal', short: 'CY' },
+            { id: 'tom', label: 'Tom', short: 'TM' }
         ];
 
         tracks.forEach(function(track) {
@@ -3466,7 +3533,7 @@
 
             var label = document.createElement('div');
             label.className = 'track-label';
-            label.textContent = track.label;
+            label.textContent = isMobile ? track.short : track.label;
             row.appendChild(label);
 
             for (var i = 0; i < 16; i++) {
