@@ -1694,8 +1694,13 @@
             }
 
             .edit-mode {
-                max-height: none !important;
-                overflow-y: visible !important;
+                max-height: 5000px;
+                overflow-y: visible;
+            }
+
+            .edit-mode.section-hidden {
+                max-height: 0 !important;
+                overflow: hidden;
             }
 
             /* Pads: horizontal compact row on desktop */
