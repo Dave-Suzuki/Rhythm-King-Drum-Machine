@@ -1315,7 +1315,7 @@
         /* Pads mode: maximize pad area but fit on screen */
         .pads-mode .drum-pads {
             gap: 6px;
-            height: calc(100dvh - 200px);
+            height: calc(100dvh - 270px);
             grid-template-rows: repeat(4, 1fr);
         }
 
@@ -1323,6 +1323,7 @@
             min-height: 0;
             font-size: 1em;
             height: 100%;
+            overflow: hidden;
         }
 
         /* Mini transport for pads mode */
@@ -1495,7 +1496,7 @@
             }
 
             .pads-mode .drum-pads {
-                height: calc(100dvh - 170px);
+                height: calc(100dvh - 250px);
             }
         }
 
@@ -1560,7 +1561,7 @@
 
             .pads-mode .drum-pads {
                 grid-template-columns: repeat(4, 1fr);
-                height: calc(100dvh - 130px);
+                height: calc(100dvh - 180px);
                 grid-template-rows: repeat(2, 1fr);
             }
         }
@@ -1661,19 +1662,21 @@
             </div>
         </div>
 
+        <!-- PERSISTENT TOP BAR (all modes) -->
+        <div class="play-top-bar">
+            <button class="transport-btn play-btn" id="playBtn">Play</button>
+            <div class="play-top-info">
+                <div class="tempo-display" id="tempoDisplay">120 BPM</div>
+                <div class="visualizer" id="visualizer">
+                    <canvas id="waveformCanvas"></canvas>
+                    <div class="beat-overlay" id="beatOverlay"></div>
+                </div>
+            </div>
+            <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">Tap</button>
+        </div>
+
         <!-- MODE 1: PLAY (default) -->
         <div class="mode-panel play-mode active" id="playMode">
-            <div class="play-top-bar">
-                <button class="transport-btn play-btn" id="playBtn">Play</button>
-                <div class="play-top-info">
-                    <div class="tempo-display" id="tempoDisplay">120 BPM</div>
-                    <div class="visualizer" id="visualizer">
-                        <canvas id="waveformCanvas"></canvas>
-                        <div class="beat-overlay" id="beatOverlay"></div>
-                    </div>
-                </div>
-                <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">Tap</button>
-            </div>
 
             <div class="controls-row">
                 <div class="control-group">
@@ -1696,12 +1699,12 @@
 
             <div class="rhythm-section">
                 <div class="rhythm-category">
-                    <button class="category-toggle" data-category="latin">
+                    <button class="category-toggle open" data-category="latin">
                         <span class="category-dot latin-dot"></span>
                         Latin American
                         <span class="category-arrow">&#9662;</span>
                     </button>
-                    <div class="rhythm-buttons" id="latinButtons" style="display:none">
+                    <div class="rhythm-buttons open" id="latinButtons">
                         <button class="rhythm-btn latin-btn" data-rhythm="bossa-nova">Bossa Nova</button>
                         <button class="rhythm-btn latin-btn" data-rhythm="samba">Samba</button>
                         <button class="rhythm-btn latin-btn" data-rhythm="bolero">Bolero</button>
@@ -1762,13 +1765,6 @@
 
         <!-- MODE 2: EDIT -->
         <div class="mode-panel edit-mode" id="editMode">
-            <div class="transport-mini">
-                <button class="play-btn-mini" id="playBtnEdit">Play</button>
-                <span class="mini-tempo" id="editTempo">120 BPM</span>
-                <span class="mini-rhythm" id="editRhythm"></span>
-                <button class="tap-btn-mini" id="tapBtnEdit">Tap</button>
-            </div>
-
             <div class="pattern-editor">
                 <div class="editor-header">
                     <div>
@@ -1802,12 +1798,6 @@
 
         <!-- MODE 3: PADS (Live Play) -->
         <div class="mode-panel pads-mode" id="padsMode">
-            <div class="transport-mini">
-                <button class="play-btn-mini" id="playBtnMini">Play</button>
-                <span class="mini-tempo" id="miniTempo">120 BPM</span>
-                <span class="mini-rhythm" id="miniRhythm"></span>
-                <button class="tap-btn-mini" id="tapBtnMini">Tap</button>
-            </div>
             <div class="drum-pads">
                 <button class="drum-pad" data-drum="kick1">Kick 1<span class="pad-key">Q</span></button>
                 <button class="drum-pad" data-drum="kick2">Kick 2<span class="pad-key">W</span></button>
@@ -2795,60 +2785,43 @@
         currentMode = mode;
 
         if (mode === 'edit') {
-            // Auto-enable edit mode but don't override active rhythm
-            if (!editMode) toggleEditMode();
-            renderSequencer();
-            updateEditTransport();
-        } else if (mode === 'play') {
-            // Sync visualizer canvas size
-            var canvas = document.getElementById('waveformCanvas');
-            if (canvas) {
-                setTimeout(function() {
-                    canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
-                    canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
-                }, 50);
+            // Enable edit mode UI without switching pattern
+            if (!editMode) {
+                editMode = true;
+                var indicator = document.getElementById('editModeIndicator');
+                indicator.style.display = 'inline-block';
+                var copyPasteBtn = document.getElementById('copyPasteBtn');
+                var clearBtn = document.getElementById('clearPatternBtn');
+                var randomBtn = document.getElementById('randomizeBtn');
+                var undoBtn = document.getElementById('undoBtn');
+                copyPasteBtn.disabled = false;
+                clearBtn.disabled = false;
+                randomBtn.disabled = false;
+                undoBtn.disabled = undoHistory.length === 0;
+                copyPasteMode = 'copy';
+                copiedPattern = null;
+                copiedFromSlot = null;
+                copyPasteBtn.textContent = 'Copy';
+                copyPasteBtn.classList.remove('paste-ready');
             }
-        } else if (mode === 'pads') {
-            // Update mini transport state
-            updateMiniTransport();
+            renderSequencer();
         }
+        updateMiniTransport();
     }
 
     function updateMiniTransport() {
-        // Update pads mode transport
-        var miniBtn = document.getElementById('playBtnMini');
-        if (miniBtn) {
-            miniBtn.textContent = isPlaying ? 'Stop' : 'Play';
-            if (isPlaying) miniBtn.classList.add('playing');
-            else miniBtn.classList.remove('playing');
+        // Main play button is now persistent, just sync its state
+        var playBtn = document.getElementById('playBtn');
+        if (playBtn) {
+            playBtn.textContent = isPlaying ? 'Stop' : 'Play';
+            if (isPlaying) playBtn.classList.add('playing');
+            else playBtn.classList.remove('playing');
         }
-        var miniTempo = document.getElementById('miniTempo');
-        if (miniTempo) miniTempo.textContent = tempo + ' BPM';
-        var miniRhythm = document.getElementById('miniRhythm');
-        if (miniRhythm) {
-            if (isCustomPattern) miniRhythm.textContent = 'P' + (currentPatternSlot + 1);
-            else if (currentRhythm) miniRhythm.textContent = currentRhythm.replace(/-/g, ' ');
-            else miniRhythm.textContent = '';
-        }
-        // Also update edit mode transport
-        updateEditTransport();
+        updateActiveRhythmDisplay();
     }
 
     function updateEditTransport() {
-        var editBtn = document.getElementById('playBtnEdit');
-        if (editBtn) {
-            editBtn.textContent = isPlaying ? 'Stop' : 'Play';
-            if (isPlaying) editBtn.classList.add('playing');
-            else editBtn.classList.remove('playing');
-        }
-        var editTempo = document.getElementById('editTempo');
-        if (editTempo) editTempo.textContent = tempo + ' BPM';
-        var editRhythm = document.getElementById('editRhythm');
-        if (editRhythm) {
-            if (isCustomPattern) editRhythm.textContent = 'P' + (currentPatternSlot + 1);
-            else if (currentRhythm) editRhythm.textContent = currentRhythm.replace(/-/g, ' ');
-            else editRhythm.textContent = '';
-        }
+        updateMiniTransport();
     }
 
     // Tab click handlers
@@ -2857,16 +2830,6 @@
             switchMode(tab.dataset.mode);
         });
     });
-
-    // Mini play buttons (pads + edit modes)
-    document.getElementById('playBtnMini').addEventListener('click', function() {
-        togglePlay();
-    });
-    document.getElementById('playBtnEdit').addEventListener('click', function() {
-        togglePlay();
-    });
-    document.getElementById('tapBtnEdit').addEventListener('click', tapTempo);
-    document.getElementById('tapBtnMini').addEventListener('click', tapTempo);
 
     // Edit mode compact pads
     document.querySelectorAll('.edit-pad').forEach(function(pad) {
@@ -3632,8 +3595,6 @@
             copiedFromSlot = null;
             copyPasteBtn.textContent = 'Copy';
             copyPasteBtn.classList.remove('paste-ready');
-
-            if (!isCustomPattern) selectPatternSlot(currentPatternSlot);
         } else {
             indicator.style.display = 'none';
             if (editBtn) editBtn.classList.remove('active');
