@@ -431,10 +431,11 @@
         }
 
         /* Transport bar: [Play] [BPM] [visualizer] [Tap] */
+        /* Transport bar: [Play/Stop] [visualizer] [BPM + Tap] */
         .play-top-bar {
             display: flex;
             gap: 6px;
-            align-items: center;
+            align-items: stretch;
             margin-bottom: 8px;
             padding: 6px 8px;
             background: rgba(0,0,0,0.06);
@@ -442,39 +443,44 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        .play-top-bar .play-btn {
+        .play-top-bar .play-btn,
+        .play-top-bar .tap-tempo-btn {
             padding: 12px 18px;
             min-width: 70px;
             flex-shrink: 0;
             font-size: 0.9em;
         }
 
-        .play-top-bar .tap-tempo-btn {
-            padding: 12px 14px;
-            min-width: 56px;
+        .tap-tempo-btn.beat-blink {
+            background: linear-gradient(180deg, #bbb, #999) !important;
+            border-color: #888 !important;
+        }
+
+        .tempo-tap-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
-            font-size: 0.75em;
+            gap: 2px;
         }
 
         .play-top-bar .tempo-display {
             font-family: 'Courier New', monospace;
-            font-size: 1.5em;
+            font-size: 1.4em;
             font-weight: 800;
             color: #222;
             text-align: center;
-            flex-shrink: 0;
-            min-width: 48px;
-            margin: 0;
             line-height: 1;
+            margin: 0;
         }
 
         .play-top-bar .tempo-unit {
-            font-size: 0.6em;
+            font-size: 0.55em;
             font-weight: 600;
             color: #666;
             text-transform: uppercase;
-            flex-shrink: 0;
-            margin-right: 2px;
+            line-height: 1;
         }
 
         .play-top-bar .visualizer {
@@ -1710,13 +1716,15 @@
         <!-- PERSISTENT TOP BAR (all modes) -->
         <div class="play-top-bar">
             <button class="transport-btn play-btn" id="playBtn">Play</button>
-            <div class="tempo-display" id="tempoDisplay">120</div>
-            <span class="tempo-unit">BPM</span>
             <div class="visualizer" id="visualizer">
                 <canvas id="waveformCanvas"></canvas>
                 <div class="beat-overlay" id="beatOverlay"></div>
             </div>
-            <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">Tap</button>
+            <div class="tempo-tap-group">
+                <div class="tempo-display" id="tempoDisplay">120</div>
+                <span class="tempo-unit">BPM</span>
+                <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">TAP</button>
+            </div>
         </div>
 
         <!-- MODE 1: PLAY (default) -->
@@ -2023,42 +2031,95 @@
 
         kick(time, variant) {
             variant = variant || 1;
-            var osc = this.context.createOscillator();
-            var gain = this.context.createGain();
-            var filter = this.context.createBiquadFilter();
             var kickLevel = 1 - (balance * 0.5);
 
-            filter.type = 'lowpass';
-            filter.frequency.value = 100;
+            if (variant === 1) {
+                // KICK 1: Punchy, tight analog kick - higher pitch, short decay
+                var osc = this.context.createOscillator();
+                var gain = this.context.createGain();
+                var filter = this.context.createBiquadFilter();
 
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(variant === 1 ? 60 : 55, time);
-            osc.frequency.exponentialRampToValueAtTime(30, time + 0.1);
+                filter.type = 'lowpass';
+                filter.frequency.value = 200;
 
-            gain.gain.setValueAtTime(0.8 * kickLevel, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, time);
+                osc.frequency.exponentialRampToValueAtTime(40, time + 0.06);
 
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(this.masterGain);
+                gain.gain.setValueAtTime(0.9 * kickLevel, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
 
-            osc.start(time);
-            osc.stop(time + 0.3);
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start(time);
+                osc.stop(time + 0.2);
 
-            var click = this.context.createOscillator();
-            var clickGain = this.context.createGain();
+                // Sharp attack click
+                var click = this.context.createOscillator();
+                var clickGain = this.context.createGain();
+                click.type = 'square';
+                click.frequency.value = 300;
+                clickGain.gain.setValueAtTime(0.2 * kickLevel, time);
+                clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.015);
+                click.connect(clickGain);
+                clickGain.connect(this.masterGain);
+                click.start(time);
+                click.stop(time + 0.015);
+            } else {
+                // KICK 2: Deep sub-bass kick - low frequency, long sustain, layered harmonics
+                // Sub oscillator - very low fundamental
+                var sub = this.context.createOscillator();
+                var subGain = this.context.createGain();
+                sub.type = 'sine';
+                sub.frequency.setValueAtTime(55, time);
+                sub.frequency.exponentialRampToValueAtTime(25, time + 0.15);
+                subGain.gain.setValueAtTime(1.0 * kickLevel, time);
+                subGain.gain.setValueAtTime(0.8 * kickLevel, time + 0.05);
+                subGain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+                sub.connect(subGain);
+                subGain.connect(this.masterGain);
+                sub.start(time);
+                sub.stop(time + 0.5);
 
-            click.type = 'square';
-            click.frequency.value = 200;
+                // Second harmonic layer for warmth
+                var harm = this.context.createOscillator();
+                var harmGain = this.context.createGain();
+                harm.type = 'sine';
+                harm.frequency.setValueAtTime(110, time);
+                harm.frequency.exponentialRampToValueAtTime(50, time + 0.1);
+                harmGain.gain.setValueAtTime(0.35 * kickLevel, time);
+                harmGain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                harm.connect(harmGain);
+                harmGain.connect(this.masterGain);
+                harm.start(time);
+                harm.stop(time + 0.3);
 
-            clickGain.gain.setValueAtTime(0.15 * kickLevel, time);
-            clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.02);
+                // Third harmonic for chest thump
+                var thump = this.context.createOscillator();
+                var thumpGain = this.context.createGain();
+                thump.type = 'triangle';
+                thump.frequency.setValueAtTime(80, time);
+                thump.frequency.exponentialRampToValueAtTime(30, time + 0.08);
+                thumpGain.gain.setValueAtTime(0.25 * kickLevel, time);
+                thumpGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
+                thump.connect(thumpGain);
+                thumpGain.connect(this.masterGain);
+                thump.start(time);
+                thump.stop(time + 0.2);
 
-            click.connect(clickGain);
-            clickGain.connect(this.masterGain);
-
-            click.start(time);
-            click.stop(time + 0.02);
+                // Soft click transient
+                var click = this.context.createOscillator();
+                var clickGain = this.context.createGain();
+                click.type = 'sine';
+                click.frequency.value = 160;
+                clickGain.gain.setValueAtTime(0.1 * kickLevel, time);
+                clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.025);
+                click.connect(clickGain);
+                clickGain.connect(this.masterGain);
+                click.start(time);
+                click.stop(time + 0.025);
+            }
         }
 
         snare(time) {
@@ -2552,6 +2613,14 @@
 
     function updateVisualizer(step) {
         requestAnimationFrame(function() {
+            // Blink tap button on quarter notes (every 4 steps)
+            if (step % 4 === 0) {
+                var tapBtn = document.getElementById('tapTempoBtn');
+                if (tapBtn) {
+                    tapBtn.classList.add('beat-blink');
+                    setTimeout(function() { tapBtn.classList.remove('beat-blink'); }, 80);
+                }
+            }
             var indicators = document.querySelectorAll('.beat-indicator');
             indicators.forEach(function(ind, i) {
                 if (i === step) {
