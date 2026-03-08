@@ -1349,6 +1349,11 @@
             overflow: hidden;
         }
 
+        /* Mini pads row (desktop only, shown when Drum Pads collapsed) */
+        .section-pads-row {
+            display: none;
+        }
+
         /* ========== RESPONSIVE ========== */
 
         /* Prevent zoom on double tap */
@@ -1569,9 +1574,37 @@
                 padding: 0;
             }
 
-            /* Bigger visualizer on desktop */
+            /* Compact visualizer on desktop */
+            .play-top-bar {
+                max-height: 56px;
+            }
+
+            .play-top-bar .play-btn {
+                padding: 8px 16px;
+            }
+
+            .play-top-bar .tap-tempo-btn {
+                padding: 8px 12px;
+            }
+
             .play-top-info .visualizer {
-                min-height: 50px;
+                min-height: 24px;
+                max-height: 28px;
+            }
+
+            .play-top-info .tempo-display {
+                font-size: 0.8em;
+            }
+
+            /* Mini pads row shown next to collapsed Drum Pads toggle */
+            .section-pads-row {
+                display: flex;
+                gap: 4px;
+                margin-top: 4px;
+            }
+
+            .section-pads-row.hidden {
+                display: none;
             }
 
             /* Wider sequencer on desktop */
@@ -1827,9 +1860,19 @@
         </div>
 
         <!-- MODE 3: PADS (Live Play) -->
-        <button class="section-toggle" data-section="padsMode">
+        <button class="section-toggle" data-section="padsMode" id="padsSectionToggle">
             <span class="section-arrow">&#9662;</span> Drum Pads
         </button>
+        <div class="section-pads-row" id="sectionPadsRow">
+            <button class="edit-pad" data-drum="kick1">K1</button>
+            <button class="edit-pad" data-drum="kick2">K2</button>
+            <button class="edit-pad" data-drum="snare1">SN</button>
+            <button class="edit-pad" data-drum="clap">CL</button>
+            <button class="edit-pad" data-drum="hihat1">H1</button>
+            <button class="edit-pad" data-drum="hihat2">H2</button>
+            <button class="edit-pad" data-drum="cymbal">CY</button>
+            <button class="edit-pad" data-drum="tom">TM</button>
+        </div>
         <div class="mode-panel pads-mode" id="padsMode">
             <div class="drum-pads">
                 <button class="drum-pad" data-drum="kick1">Kick 1<span class="pad-key">Q</span></button>
@@ -2878,6 +2921,32 @@
                 toggle.classList.add('collapsed');
                 panel.classList.add('section-hidden');
             }
+            // Toggle mini pads row for Drum Pads section
+            if (sectionId === 'padsMode') {
+                var miniRow = document.getElementById('sectionPadsRow');
+                if (miniRow) {
+                    if (toggle.classList.contains('collapsed')) {
+                        miniRow.classList.remove('hidden');
+                    } else {
+                        miniRow.classList.add('hidden');
+                    }
+                }
+            }
+            // Re-render sequencer when edit is opened
+            if (sectionId === 'editMode' && !toggle.classList.contains('collapsed')) {
+                if (!editMode) {
+                    editMode = true;
+                    var ind = document.getElementById('editModeIndicator');
+                    if (ind) ind.style.display = 'inline-block';
+                    var cp = document.getElementById('copyPasteBtn');
+                    var cl = document.getElementById('clearPatternBtn');
+                    var r = document.getElementById('randomizeBtn');
+                    if (cp) cp.disabled = false;
+                    if (cl) cl.disabled = false;
+                    if (r) r.disabled = false;
+                }
+                renderSequencer();
+            }
         });
     });
 
@@ -2965,20 +3034,24 @@
     loadProjectsFromStorage();
     updateActiveRhythmDisplay();
 
-    // On desktop, auto-enable edit mode since all panels are visible
+    // On desktop, fold Edit and Pads by default, show mini pads
     if (window.innerWidth >= 769) {
-        if (!editMode) {
-            editMode = true;
-            var indicator = document.getElementById('editModeIndicator');
-            if (indicator) indicator.style.display = 'inline-block';
-            var cpBtn = document.getElementById('copyPasteBtn');
-            var clBtn = document.getElementById('clearPatternBtn');
-            var rBtn = document.getElementById('randomizeBtn');
-            if (cpBtn) cpBtn.disabled = false;
-            if (clBtn) clBtn.disabled = false;
-            if (rBtn) rBtn.disabled = false;
+        // Collapse Edit
+        var editToggle = document.querySelector('[data-section="editMode"]');
+        var editPanel = document.getElementById('editMode');
+        if (editToggle && editPanel) {
+            editToggle.classList.add('collapsed');
+            editPanel.classList.add('section-hidden');
         }
-        renderSequencer();
+        // Collapse Pads, show mini pads row
+        var padsToggle = document.getElementById('padsSectionToggle');
+        var padsPanel = document.getElementById('padsMode');
+        var miniRow = document.getElementById('sectionPadsRow');
+        if (padsToggle && padsPanel) {
+            padsToggle.classList.add('collapsed');
+            padsPanel.classList.add('section-hidden');
+        }
+        if (miniRow) miniRow.classList.remove('hidden');
     }
 
     // Menu Management
