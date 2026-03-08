@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rhythm King">
+    <meta name="theme-color" content="#1a1a2e">
     <title>Maestro Rhythm King MRK-2</title>
     <style>
         * {
@@ -1047,6 +1051,7 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Tablet and small laptop */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -1142,7 +1147,7 @@
             }
 
             /* Prevent zooming on double tap */
-            button, .drum-pad, .step-button {
+            button, .drum-pad, .step-button, .rhythm-btn, .pattern-slot {
                 touch-action: manipulation;
             }
 
@@ -1167,8 +1172,23 @@
             }
         }
 
-        /* Extra small devices */
+        /* iPhone Plus / iPhone Pro Max (430px and below) */
         @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .drum-machine {
+                padding: 15px;
+                border-radius: 12px;
+                margin: 5px 0;
+                border-width: 1px;
+            }
+
+            .machine-header {
+                margin-bottom: 15px;
+            }
+
             .machine-title {
                 font-size: 1.2em;
                 letter-spacing: 1px;
@@ -1178,28 +1198,456 @@
                 font-size: 0.7em;
             }
 
-            .sequencer-row {
-                min-width: 450px;
-                grid-template-columns: 40px repeat(16, minmax(20px, 1fr));
-                gap: 2px;
+            /* Controls: 2-column grid on phones */
+            .controls-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 12px;
+                margin-bottom: 15px;
             }
 
-            .step-button {
-                border-radius: 2px;
+            .control-label {
+                font-size: 0.7em;
+                margin-bottom: 4px;
+            }
+
+            .tempo-display {
+                font-size: 1em;
+            }
+
+            .swing-display {
+                font-size: 0.75em;
+            }
+
+            .slider {
+                height: 24px;
+                margin-top: 8px;
+            }
+
+            .slider::-webkit-slider-thumb {
+                width: 34px;
+                height: 34px;
+            }
+
+            .slider::-moz-range-thumb {
+                width: 34px;
+                height: 34px;
+            }
+
+            /* Visualizer smaller */
+            .visualizer {
+                height: 50px;
+                margin: 10px 0;
+            }
+
+            /* Transport: full width buttons, stacked */
+            .transport-controls {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .transport-btn {
+                padding: 16px 20px;
+                font-size: 0.95em;
+                flex: 1;
+                min-height: 48px;
+            }
+
+            /* Rhythm buttons: 3 columns, larger touch targets */
+            .rhythm-section {
+                margin-bottom: 15px;
+            }
+
+            .rhythm-category {
+                margin-bottom: 12px;
             }
 
             .category-title {
                 font-size: 0.75em;
+                margin-bottom: 6px;
             }
 
+            .rhythm-buttons {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .rhythm-btn {
+                padding: 12px 4px;
+                font-size: 0.7em;
+                min-height: 44px;
+            }
+
+            /* Pattern editor compact */
+            .pattern-editor {
+                margin: 15px 0;
+                padding: 12px;
+            }
+
+            .editor-header {
+                margin-bottom: 12px;
+                gap: 8px;
+            }
+
+            .editor-title {
+                font-size: 1em;
+            }
+
+            .pattern-controls {
+                gap: 6px;
+            }
+
+            .pattern-btn {
+                padding: 10px 8px;
+                font-size: 0.75em;
+                min-height: 44px;
+                min-width: 60px;
+            }
+
+            .pattern-slots {
+                gap: 4px;
+                margin-bottom: 12px;
+            }
+
+            .pattern-slot {
+                padding: 10px 6px;
+                font-size: 0.8em;
+                min-height: 44px;
+                min-width: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .pattern-info {
+                font-size: 0.7em;
+                padding: 8px;
+                margin: 10px 0;
+                line-height: 1.4;
+            }
+
+            /* Sequencer: tighter grid */
+            .sequencer-row {
+                min-width: 420px;
+                grid-template-columns: 40px repeat(16, minmax(20px, 1fr));
+                gap: 2px;
+            }
+
+            .track-label {
+                font-size: 0.6em;
+                padding: 3px 2px;
+            }
+
+            .step-button {
+                min-height: 28px;
+                min-width: 18px;
+                border-radius: 2px;
+            }
+
+            /* Drum pads: 2x4 grid, big touch targets */
+            .drum-pads {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 12px;
+                margin-top: 15px;
+            }
+
+            .drum-pad {
+                min-height: 56px;
+                font-size: 0.75em;
+                border-radius: 6px;
+            }
+
+            .drum-pad .pad-key {
+                display: none;
+            }
+
+            /* Slide menu: full width on phones */
             .slide-menu {
-                width: 250px;
-                right: -250px;
+                width: 85vw;
+                right: -85vw;
+            }
+
+            .menu-header {
+                padding: 15px;
+            }
+
+            .menu-section {
+                padding: 10px;
             }
 
             .menu-item {
-                padding: 10px;
+                padding: 12px 10px;
                 font-size: 0.85em;
+                min-height: 44px;
+            }
+
+            /* Modal */
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            /* Shortcuts */
+            .shortcuts-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .shortcut-row {
+                padding: 6px 0;
+                font-size: 0.85em;
+            }
+
+            /* Toast */
+            .toast {
+                font-size: 0.8em;
+                padding: 8px 16px;
+                bottom: 20px;
+            }
+        }
+
+        /* iPhone SE / iPhone Mini / small phones (375px and below) */
+        @media (max-width: 375px) {
+            body {
+                padding: 3px;
+            }
+
+            .drum-machine {
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            .machine-title {
+                font-size: 1em;
+                letter-spacing: 0.5px;
+            }
+
+            .machine-subtitle {
+                font-size: 0.6em;
+                letter-spacing: 1px;
+            }
+
+            .controls-section {
+                gap: 8px;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .control-label {
+                font-size: 0.65em;
+            }
+
+            .transport-controls {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .transport-btn {
+                padding: 14px 15px;
+                font-size: 0.85em;
+                letter-spacing: 0.5px;
+            }
+
+            .rhythm-buttons {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+            }
+
+            .rhythm-btn {
+                padding: 10px 3px;
+                font-size: 0.65em;
+                min-height: 40px;
+            }
+
+            .pattern-editor {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .editor-title {
+                font-size: 0.9em;
+                letter-spacing: 1px;
+            }
+
+            .pattern-btn {
+                padding: 8px 6px;
+                font-size: 0.7em;
+                min-width: 50px;
+            }
+
+            .pattern-slot {
+                padding: 8px 4px;
+                font-size: 0.75em;
+            }
+
+            .pattern-info {
+                font-size: 0.65em;
+            }
+
+            .sequencer-row {
+                min-width: 380px;
+                grid-template-columns: 35px repeat(16, minmax(18px, 1fr));
+                gap: 2px;
+            }
+
+            .track-label {
+                font-size: 0.55em;
+                padding: 2px;
+            }
+
+            .step-button {
+                min-height: 24px;
+                min-width: 16px;
+            }
+
+            .drum-pads {
+                gap: 6px;
+                padding: 10px;
+                margin-top: 10px;
+            }
+
+            .drum-pad {
+                min-height: 50px;
+                font-size: 0.7em;
+            }
+
+            .slide-menu {
+                width: 90vw;
+                right: -90vw;
+            }
+
+            .visualizer {
+                height: 40px;
+                margin: 8px 0;
+            }
+        }
+
+        /* iPhone SE 1st gen / very narrow screens (320px) */
+        @media (max-width: 320px) {
+            .drum-machine {
+                padding: 8px;
+            }
+
+            .machine-title {
+                font-size: 0.9em;
+            }
+
+            .controls-section {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                padding: 8px;
+            }
+
+            .rhythm-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .rhythm-btn {
+                font-size: 0.65em;
+                padding: 10px 4px;
+            }
+
+            .transport-btn {
+                padding: 12px 10px;
+                font-size: 0.8em;
+            }
+
+            .sequencer-row {
+                min-width: 340px;
+                grid-template-columns: 30px repeat(16, minmax(16px, 1fr));
+            }
+
+            .drum-pads {
+                gap: 5px;
+                padding: 8px;
+            }
+
+            .drum-pad {
+                min-height: 44px;
+                font-size: 0.65em;
+            }
+        }
+
+        /* Safe area insets for iPhone with notch/Dynamic Island */
+        @supports (padding: env(safe-area-inset-top)) {
+            @media (max-width: 480px) {
+                body {
+                    padding-top: calc(5px + env(safe-area-inset-top));
+                    padding-bottom: calc(5px + env(safe-area-inset-bottom));
+                    padding-left: calc(5px + env(safe-area-inset-left));
+                    padding-right: calc(5px + env(safe-area-inset-right));
+                }
+
+                .toast {
+                    bottom: calc(20px + env(safe-area-inset-bottom));
+                }
+
+                .slide-menu {
+                    padding-top: env(safe-area-inset-top);
+                    padding-bottom: env(safe-area-inset-bottom);
+                }
+            }
+        }
+
+        /* Landscape mode on phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .drum-machine {
+                padding: 10px 15px;
+                margin: 5px 0;
+            }
+
+            .machine-header {
+                margin-bottom: 8px;
+            }
+
+            .machine-title {
+                font-size: 1.1em;
+            }
+
+            .controls-section {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+                padding: 8px;
+                margin-bottom: 8px;
+            }
+
+            .visualizer {
+                height: 35px;
+                margin: 5px 0;
+            }
+
+            .transport-controls {
+                margin-bottom: 8px;
+            }
+
+            .transport-btn {
+                padding: 10px 20px;
+            }
+
+            .rhythm-category {
+                margin-bottom: 8px;
+            }
+
+            .rhythm-btn {
+                padding: 8px 4px;
+                min-height: 36px;
+            }
+
+            .pattern-editor {
+                margin: 8px 0;
+                padding: 8px;
+            }
+
+            .drum-pads {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+                padding: 8px;
+                margin-top: 8px;
+            }
+
+            .drum-pad {
+                min-height: 44px;
             }
         }
     </style>
