@@ -430,45 +430,58 @@
             transform: translateY(1px);
         }
 
-        /* Compact play top bar: [Play] [visualizer+tempo] [Tap] */
+        /* Transport bar: [Play] [BPM] [visualizer] [Tap] */
         .play-top-bar {
             display: flex;
-            gap: 8px;
-            align-items: stretch;
+            gap: 6px;
+            align-items: center;
             margin-bottom: 8px;
+            padding: 6px 8px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .play-top-bar .play-btn {
-            padding: 10px 16px;
-            min-width: 60px;
+            padding: 12px 18px;
+            min-width: 70px;
             flex-shrink: 0;
+            font-size: 0.9em;
         }
 
         .play-top-bar .tap-tempo-btn {
-            padding: 10px 12px;
-            min-width: 48px;
+            padding: 12px 14px;
+            min-width: 56px;
             flex-shrink: 0;
             font-size: 0.75em;
         }
 
-        .play-top-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
+        .play-top-bar .tempo-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            font-weight: 800;
+            color: #222;
+            text-align: center;
+            flex-shrink: 0;
+            min-width: 48px;
+            margin: 0;
+            line-height: 1;
         }
 
-        .play-top-info .tempo-display {
-            font-size: 0.9em;
-            margin: 0;
+        .play-top-bar .tempo-unit {
+            font-size: 0.6em;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            margin-right: 2px;
         }
 
-        .play-top-info .visualizer {
+        .play-top-bar .visualizer {
             flex: 1;
-            min-height: 30px;
+            height: 36px;
+            min-height: 36px;
             margin: 0;
-            height: auto;
         }
 
         /* Compact single-row controls */
@@ -817,12 +830,9 @@
         }
 
         .tempo-display {
-            text-align: center;
-            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #333;
-            margin: 4px 0;
-            font-family: 'Courier New', monospace;
         }
 
         /* Waveform Visualizer */
@@ -1574,26 +1584,14 @@
                 padding: 0;
             }
 
-            /* Compact visualizer on desktop */
-            .play-top-bar {
-                max-height: 56px;
+            /* Desktop transport: slightly larger */
+            .play-top-bar .tempo-display {
+                font-size: 1.8em;
             }
 
-            .play-top-bar .play-btn {
-                padding: 8px 16px;
-            }
-
-            .play-top-bar .tap-tempo-btn {
-                padding: 8px 12px;
-            }
-
-            .play-top-info .visualizer {
-                min-height: 24px;
-                max-height: 28px;
-            }
-
-            .play-top-info .tempo-display {
-                font-size: 0.8em;
+            .play-top-bar .visualizer {
+                height: 40px;
+                min-height: 40px;
             }
 
             /* Mini pads row shown next to collapsed Drum Pads toggle */
@@ -1722,12 +1720,11 @@
         <!-- PERSISTENT TOP BAR (all modes) -->
         <div class="play-top-bar">
             <button class="transport-btn play-btn" id="playBtn">Play</button>
-            <div class="play-top-info">
-                <div class="tempo-display" id="tempoDisplay">120 BPM</div>
-                <div class="visualizer" id="visualizer">
-                    <canvas id="waveformCanvas"></canvas>
-                    <div class="beat-overlay" id="beatOverlay"></div>
-                </div>
+            <div class="tempo-display" id="tempoDisplay">120</div>
+            <span class="tempo-unit">BPM</span>
+            <div class="visualizer" id="visualizer">
+                <canvas id="waveformCanvas"></canvas>
+                <div class="beat-overlay" id="beatOverlay"></div>
             </div>
             <button class="transport-btn tap-tempo-btn" id="tapTempoBtn">Tap</button>
         </div>
@@ -2659,7 +2656,7 @@
             if (newTempo >= 60 && newTempo <= 200) {
                 tempo = newTempo;
                 document.getElementById('tempoSlider').value = tempo;
-                document.getElementById('tempoDisplay').textContent = tempo + ' BPM';
+                document.getElementById('tempoDisplay').textContent = tempo;
             }
         }
 
@@ -2729,7 +2726,7 @@
     // Tempo control
     document.getElementById('tempoSlider').addEventListener('input', function(e) {
         tempo = parseInt(e.target.value);
-        document.getElementById('tempoDisplay').textContent = tempo + ' BPM';
+        document.getElementById('tempoDisplay').textContent = tempo;
     });
 
     // Swing control
@@ -3034,24 +3031,24 @@
     loadProjectsFromStorage();
     updateActiveRhythmDisplay();
 
-    // On desktop, fold Edit and Pads by default, show mini pads
+    // On desktop, show all sections open and enable edit mode
     if (window.innerWidth >= 769) {
-        // Collapse Edit
-        var editToggle = document.querySelector('[data-section="editMode"]');
-        var editPanel = document.getElementById('editMode');
-        if (editToggle && editPanel) {
-            editToggle.classList.add('collapsed');
-            editPanel.classList.add('section-hidden');
-        }
-        // Collapse Pads, show mini pads row
-        var padsToggle = document.getElementById('padsSectionToggle');
-        var padsPanel = document.getElementById('padsMode');
+        // Hide mini pads row (all sections open, full pads visible)
         var miniRow = document.getElementById('sectionPadsRow');
-        if (padsToggle && padsPanel) {
-            padsToggle.classList.add('collapsed');
-            padsPanel.classList.add('section-hidden');
+        if (miniRow) miniRow.classList.add('hidden');
+        // Enable edit mode
+        if (!editMode) {
+            editMode = true;
+            var ind = document.getElementById('editModeIndicator');
+            if (ind) ind.style.display = 'inline-block';
+            var cp = document.getElementById('copyPasteBtn');
+            var cl = document.getElementById('clearPatternBtn');
+            var r = document.getElementById('randomizeBtn');
+            if (cp) cp.disabled = false;
+            if (cl) cl.disabled = false;
+            if (r) r.disabled = false;
         }
-        if (miniRow) miniRow.classList.remove('hidden');
+        renderSequencer();
     }
 
     // Menu Management
@@ -3222,7 +3219,7 @@
 
         document.getElementById('projectNameInput').value = project.name;
         document.getElementById('tempoSlider').value = tempo;
-        document.getElementById('tempoDisplay').textContent = tempo + ' BPM';
+        document.getElementById('tempoDisplay').textContent = tempo;
         document.getElementById('swingSlider').value = swing;
         document.getElementById('swingDisplay').textContent = swing + '%';
         document.title = project.name + ' - Maestro Rhythm King MRK-2';
@@ -3295,7 +3292,7 @@
 
                 document.getElementById('projectNameInput').value = projectData.name + ' (Imported)';
                 document.getElementById('tempoSlider').value = tempo;
-                document.getElementById('tempoDisplay').textContent = tempo + ' BPM';
+                document.getElementById('tempoDisplay').textContent = tempo;
                 document.getElementById('swingSlider').value = swing;
                 document.getElementById('swingDisplay').textContent = swing + '%';
 
@@ -3361,7 +3358,7 @@
 
                 document.getElementById('projectNameInput').value = shareData.name + ' (Shared)';
                 document.getElementById('tempoSlider').value = tempo;
-                document.getElementById('tempoDisplay').textContent = tempo + ' BPM';
+                document.getElementById('tempoDisplay').textContent = tempo;
                 document.getElementById('swingSlider').value = swing;
                 document.getElementById('swingDisplay').textContent = swing + '%';
 
@@ -3571,7 +3568,8 @@
             slot.className = 'pattern-slot';
             slot.textContent = 'P' + (i + 1);
             slot.dataset.slot = i;
-            if (i === 0) slot.classList.add('active');
+            // Only highlight if we're actually in custom pattern mode on this slot
+            if (isCustomPattern && i === currentPatternSlot) slot.classList.add('active');
             (function(idx) {
                 slot.addEventListener('click', function() { selectPatternSlot(idx); });
             })(i);
