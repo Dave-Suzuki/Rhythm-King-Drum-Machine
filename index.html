@@ -2754,12 +2754,14 @@
     function nextNote() {
         var secondsPerBeat = 60.0 / tempo / 4;
 
-        // Apply swing to even-numbered steps (off-beats)
-        if (swing > 0 && currentStep % 2 === 1) {
-            var swingAmount = (swing / 100) * secondsPerBeat * 0.33;
-            nextNoteTime += secondsPerBeat + swingAmount;
+        // Apply swing: delay off-beats, compensate on-beats to keep overall tempo
+        var swingOffset = (swing / 100) * secondsPerBeat * 0.33;
+        if (currentStep % 2 === 1) {
+            // Off-beat: delay by swing amount
+            nextNoteTime += secondsPerBeat + swingOffset;
         } else {
-            nextNoteTime += secondsPerBeat;
+            // On-beat: arrive early to compensate
+            nextNoteTime += secondsPerBeat - swingOffset;
         }
 
         currentStep = (currentStep + 1) % 16;
