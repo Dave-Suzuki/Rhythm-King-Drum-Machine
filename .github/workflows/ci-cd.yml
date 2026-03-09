@@ -1,0 +1,36 @@
+name: CI/CD - Auto Deploy
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to gh-pages
+        run: |
+          git fetch origin gh-pages
+          git checkout gh-pages
+          git checkout ${{ github.sha }} -- index.html CLAUDE.md .github
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Deploy: $(git log ${{ github.sha }} -1 --pretty='%s')"
+            git push origin gh-pages
+          fi
