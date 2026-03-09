@@ -2106,7 +2106,9 @@
     function getGrooveOffset(instrument) {
         var profile = GROOVE_PROFILES[instrument];
         if (!profile) return 0;
-        var offsetMs = grooveAmount * profile.multiplier * profile.maxMs;
+        // Negative grooveAmount = laid back (late), positive = on top (early)
+        // Negate so positive grooveAmount shifts notes earlier in time
+        var offsetMs = -grooveAmount * profile.multiplier * profile.maxMs;
         var humanize = Math.random() * 6 - 3; // ±3ms
         return (offsetMs + humanize) / 1000;
     }
@@ -2725,22 +2727,22 @@
         if (isCustomPattern && customPatterns[currentPatternSlot]) {
             pattern = customPatterns[currentPatternSlot].pattern;
             if (pattern) {
-                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(Math.max(time, time + getGrooveOffset('kick')), 1);
-                if (pattern.kick2 && pattern.kick2[beatNumber]) drumSynth.kick(Math.max(time, time + getGrooveOffset('kick2')), 2);
-                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(Math.max(time, time + getGrooveOffset('snare')));
-                if (pattern.clap && pattern.clap[beatNumber]) drumSynth.clap(Math.max(time, time + getGrooveOffset('clap')));
-                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(Math.max(time, time + getGrooveOffset('hihat')), false);
-                if (pattern.hihat2 && pattern.hihat2[beatNumber]) drumSynth.hihat(Math.max(time, time + getGrooveOffset('hihat2')), true);
-                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(Math.max(time, time + getGrooveOffset('cymbal')));
-                if (pattern.tom && pattern.tom[beatNumber]) drumSynth.tom(Math.max(time, time + getGrooveOffset('tom')));
+                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick'), 1);
+                if (pattern.kick2 && pattern.kick2[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick2'), 2);
+                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time + getGrooveOffset('snare'));
+                if (pattern.clap && pattern.clap[beatNumber]) drumSynth.clap(time + getGrooveOffset('clap'));
+                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat'), false);
+                if (pattern.hihat2 && pattern.hihat2[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat2'), true);
+                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time + getGrooveOffset('cymbal'));
+                if (pattern.tom && pattern.tom[beatNumber]) drumSynth.tom(time + getGrooveOffset('tom'));
             }
         } else if (currentRhythm && rhythmPatterns[currentRhythm]) {
             pattern = rhythmPatterns[currentRhythm];
             if (pattern) {
-                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(Math.max(time, time + getGrooveOffset('kick')), 1);
-                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(Math.max(time, time + getGrooveOffset('snare')));
-                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(Math.max(time, time + getGrooveOffset('hihat')), false);
-                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(Math.max(time, time + getGrooveOffset('cymbal')));
+                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick'), 1);
+                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time + getGrooveOffset('snare'));
+                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat'), false);
+                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time + getGrooveOffset('cymbal'));
             }
         }
 
