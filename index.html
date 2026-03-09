@@ -2193,6 +2193,31 @@
         }
     }
 
+    // iOS audio resume: Safari suspends AudioContext when page goes to background
+    function resumeAudioContext() {
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume().then(function() {
+                // If sequencer was playing, re-sync the scheduler
+                if (isPlaying) {
+                    clearTimeout(timerID);
+                    nextNoteTime = audioContext.currentTime;
+                    scheduler();
+                }
+            });
+        }
+    }
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            resumeAudioContext();
+        }
+    });
+
+    // iOS sometimes needs a touch event to unlock audio after returning from background
+    document.addEventListener('touchstart', function iosAudioUnlock() {
+        resumeAudioContext();
+    }, { passive: true });
+
     // Analog-style drum synthesis
     class AnalogDrumSynth {
         constructor(context) {
