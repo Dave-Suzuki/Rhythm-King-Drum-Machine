@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Rhythm King">
     <meta name="theme-color" content="#1a1a2e">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='60' cy='60' r='56' fill='%231a1a1a' stroke='%23555' stroke-width='2'/%3E%3Cpath d='M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62' fill='none' stroke='%23c8c2b6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='30' y1='62' x2='90' y2='62' stroke='%23c8c2b6' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='78' r='4' fill='%2300cc00'/%3E%3C/svg%3E">
     <title>Maestro Rhythm King MRK-2</title>
     <style>
         * {
@@ -1750,13 +1751,254 @@
                 min-height: 32px;
             }
         }
+        /* === SPLASH SCREEN === */
+        .splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #111;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease;
+        }
+
+        .splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            animation: splashPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes splashPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+
+        .splash-title {
+            color: #d0d0d0;
+            font-size: 1.8em;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            margin-top: 20px;
+        }
+
+        .splash-subtitle {
+            color: #555;
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-top: 8px;
+        }
+
+        .splash-loader {
+            width: 60px;
+            height: 2px;
+            background: #333;
+            border-radius: 1px;
+            margin-top: 32px;
+            overflow: hidden;
+        }
+
+        .splash-loader-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #888, #ccc);
+            border-radius: 1px;
+            animation: splashLoad 1.4s ease-in-out forwards;
+        }
+
+        @keyframes splashLoad {
+            0% { width: 0%; }
+            60% { width: 80%; }
+            100% { width: 100%; }
+        }
+
+        /* === ONBOARDING OVERLAY === */
+        .onboarding-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .onboarding-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .onboarding-card {
+            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+            color: #ccc;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        .onboarding-card .splash-logo {
+            width: 72px;
+            height: 72px;
+            animation: none;
+            margin: 0 auto 16px;
+            display: block;
+        }
+
+        .onboarding-card h2 {
+            color: #d0d0d0;
+            font-weight: 300;
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .onboarding-steps {
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .onboarding-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        .onboarding-step-num {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #449944, #336633);
+            color: #fff;
+            font-size: 0.75em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .onboarding-step-text {
+            color: #aaa;
+        }
+
+        .onboarding-step-text strong {
+            color: #d0d0d0;
+        }
+
+        .onboarding-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .onboarding-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #444;
+            transition: background 0.3s;
+        }
+
+        .onboarding-dot.active {
+            background: #888;
+        }
+
+        .onboarding-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .onboarding-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .onboarding-btn-primary {
+            background: linear-gradient(180deg, #449944, #336633);
+            color: #fff;
+            border: 1px solid #2a5a2a;
+        }
+
+        .onboarding-btn-secondary {
+            background: linear-gradient(180deg, #555, #3a3a3a);
+            color: #ccc;
+            border: 1px solid #666;
+        }
+
+        .onboarding-btn:active {
+            transform: translateY(1px);
+        }
+
     </style>
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <svg class="splash-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <!-- Outer ring -->
+            <circle cx="60" cy="60" r="56" fill="none" stroke="#444" stroke-width="2"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#333" stroke-width="1"/>
+            <!-- Dark face -->
+            <circle cx="60" cy="60" r="50" fill="#1a1a1a"/>
+            <!-- Crown / waveform motif -->
+            <path d="M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62"
+                  fill="none" stroke="#c8c2b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Base line -->
+            <line x1="30" y1="62" x2="90" y2="62" stroke="#c8c2b6" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Power dot -->
+            <circle cx="60" cy="78" r="3" fill="#00cc00" opacity="0.9"/>
+            <!-- Metallic ring -->
+            <circle cx="60" cy="60" r="56" fill="none" stroke="#666" stroke-width="0.5"/>
+        </svg>
+        <div class="splash-title">Rhythm King</div>
+        <div class="splash-subtitle">Maestro MRK-2</div>
+        <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+    </div>
+
+    <!-- Onboarding Overlay -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+        <div class="onboarding-card" id="onboardingCard">
+            <!-- Page content injected by JS -->
+        </div>
+    </div>
+
     <div class="drum-machine">
         <div class="machine-header">
             <div class="power-indicator"></div>
-            <h1 class="machine-title">Rhythm King</h1>
+            <svg class="header-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;vertical-align:middle;margin-right:6px;display:inline-block;position:relative;top:-1px;">
+                <circle cx="60" cy="60" r="56" fill="none" stroke="#555" stroke-width="2"/>
+                <circle cx="60" cy="60" r="50" fill="#1a1a1a"/>
+                <path d="M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62" fill="none" stroke="#c8c2b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="30" y1="62" x2="90" y2="62" stroke="#c8c2b6" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="60" cy="78" r="3" fill="#00cc00" opacity="0.9"/>
+            </svg><h1 class="machine-title" style="display:inline;">Rhythm King</h1>
             <p class="machine-subtitle">Maestro MRK-2</p>
             <button class="menu-button" id="menuButton">
                 <span></span>
@@ -4314,6 +4556,123 @@
             selectPatternSlot(parseInt(e.key) - 1);
         }
     });
+
+    // === SPLASH SCREEN ===
+    (function() {
+        var splash = document.getElementById('splashScreen');
+        if (!splash) return;
+        setTimeout(function() {
+            splash.classList.add('fade-out');
+            setTimeout(function() {
+                splash.remove();
+                // After splash, check if first run
+                if (!localStorage.getItem('mrk2_onboarded')) {
+                    showOnboarding();
+                }
+            }, 600);
+        }, 1800);
+    })();
+
+    // === ONBOARDING / FIRST-RUN EXPERIENCE ===
+    var onboardingPage = 0;
+    var onboardingPages = [
+        {
+            title: 'Welcome',
+            steps: [
+                { text: 'Pick a <strong>rhythm preset</strong> from Latin, American, or Traditional categories' },
+                { text: 'Hit <strong>Play</strong> and tweak the <strong>knobs</strong> — Vol, Tone, Speed, Swing, Groove' },
+                { text: 'Use <strong>drum pads</strong> to trigger sounds live' }
+            ]
+        },
+        {
+            title: 'Pattern Editor',
+            steps: [
+                { text: 'Switch to <strong>Edit</strong> mode to build your own 16-step patterns' },
+                { text: 'Tap grid cells to place hits — 8 slots for different patterns' },
+                { text: '<strong>Copy, paste, randomize</strong> — or undo with Ctrl+Z' }
+            ]
+        },
+        {
+            title: 'Save & Share',
+            steps: [
+                { text: 'Open the <strong>menu</strong> (top-right) to save and load projects' },
+                { text: '<strong>Record audio</strong> directly to a downloadable WAV file' },
+                { text: '<strong>Share</strong> your patterns via link — no account needed' }
+            ]
+        }
+    ];
+
+    function renderOnboardingPage() {
+        var page = onboardingPages[onboardingPage];
+        var card = document.getElementById('onboardingCard');
+        var logoSvg = '<svg class="splash-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">' +
+            '<circle cx="60" cy="60" r="56" fill="none" stroke="#444" stroke-width="2"/>' +
+            '<circle cx="60" cy="60" r="50" fill="#1a1a1a"/>' +
+            '<path d="M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62" fill="none" stroke="#c8c2b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<line x1="30" y1="62" x2="90" y2="62" stroke="#c8c2b6" stroke-width="1.5" stroke-linecap="round"/>' +
+            '<circle cx="60" cy="78" r="3" fill="#00cc00" opacity="0.9"/>' +
+            '</svg>';
+
+        var stepsHtml = '';
+        for (var i = 0; i < page.steps.length; i++) {
+            stepsHtml += '<div class="onboarding-step">' +
+                '<div class="onboarding-step-num">' + (i + 1) + '</div>' +
+                '<div class="onboarding-step-text">' + page.steps[i].text + '</div></div>';
+        }
+
+        var dotsHtml = '<div class="onboarding-dots">';
+        for (var d = 0; d < onboardingPages.length; d++) {
+            dotsHtml += '<div class="onboarding-dot' + (d === onboardingPage ? ' active' : '') + '"></div>';
+        }
+        dotsHtml += '</div>';
+
+        var isLast = onboardingPage === onboardingPages.length - 1;
+        var isFirst = onboardingPage === 0;
+        var buttonsHtml = '<div class="onboarding-buttons">';
+        if (!isFirst) {
+            buttonsHtml += '<button class="onboarding-btn onboarding-btn-secondary" onclick="prevOnboarding()">Back</button>';
+        } else {
+            buttonsHtml += '<button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboarding()">Skip</button>';
+        }
+        buttonsHtml += '<button class="onboarding-btn onboarding-btn-primary" onclick="' +
+            (isLast ? 'finishOnboarding()' : 'nextOnboarding()') + '">' +
+            (isLast ? 'Get Started' : 'Next') + '</button></div>';
+
+        card.innerHTML = logoSvg + '<h2>' + page.title + '</h2>' +
+            '<div class="onboarding-steps">' + stepsHtml + '</div>' +
+            dotsHtml + buttonsHtml;
+    }
+
+    function showOnboarding() {
+        onboardingPage = 0;
+        renderOnboardingPage();
+        var overlay = document.getElementById('onboardingOverlay');
+        overlay.classList.add('active');
+    }
+
+    function nextOnboarding() {
+        if (onboardingPage < onboardingPages.length - 1) {
+            onboardingPage++;
+            renderOnboardingPage();
+        }
+    }
+
+    function prevOnboarding() {
+        if (onboardingPage > 0) {
+            onboardingPage--;
+            renderOnboardingPage();
+        }
+    }
+
+    function skipOnboarding() {
+        finishOnboarding();
+    }
+
+    function finishOnboarding() {
+        localStorage.setItem('mrk2_onboarded', '1');
+        var overlay = document.getElementById('onboardingOverlay');
+        overlay.classList.remove('active');
+    }
 </script>
 </body>
 </html>
