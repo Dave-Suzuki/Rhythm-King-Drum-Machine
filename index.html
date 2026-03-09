@@ -4561,16 +4561,26 @@
     (function() {
         var splash = document.getElementById('splashScreen');
         if (!splash) return;
-        setTimeout(function() {
+        var dismissed = false;
+
+        function dismissSplash() {
+            if (dismissed) return;
+            dismissed = true;
             splash.classList.add('fade-out');
             setTimeout(function() {
                 splash.remove();
-                // After splash, check if first run
                 if (!localStorage.getItem('mrk2_onboarded')) {
                     showOnboarding();
                 }
             }, 600);
-        }, 1800);
+        }
+
+        // Auto-dismiss after loading animation completes
+        setTimeout(dismissSplash, 1800);
+        // Also dismiss on tap/click/keypress so user isn't blocked
+        splash.addEventListener('click', dismissSplash);
+        splash.addEventListener('touchstart', dismissSplash, { passive: true });
+        document.addEventListener('keydown', dismissSplash, { once: true });
     })();
 
     // === ONBOARDING / FIRST-RUN EXPERIENCE ===
@@ -4672,6 +4682,8 @@
         localStorage.setItem('mrk2_onboarded', '1');
         var overlay = document.getElementById('onboardingOverlay');
         overlay.classList.remove('active');
+        // Use this user gesture to pre-unlock the AudioContext
+        initAudio();
     }
 </script>
 </body>
