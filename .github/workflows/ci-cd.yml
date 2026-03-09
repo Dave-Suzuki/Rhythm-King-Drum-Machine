@@ -29,6 +29,7 @@ jobs:
 
       - name: Merge into master
         run: |
+          git fetch origin master:master
           git checkout master
           git merge --ff-only ${{ github.ref_name }} || git merge --no-edit ${{ github.ref_name }}
           git push origin master
@@ -52,6 +53,7 @@ jobs:
 
       - name: Deploy to gh-pages
         run: |
+          git fetch origin gh-pages:gh-pages
           git checkout gh-pages
           git checkout master -- index.html CLAUDE.md
           git add -A
