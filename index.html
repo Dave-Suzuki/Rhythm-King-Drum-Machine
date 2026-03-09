@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Rhythm King">
+    <meta name="apple-mobile-web-app-title" content="Rhythm Knight">
     <meta name="theme-color" content="#1a1a2e">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='60' cy='60' r='56' fill='%231a1a1a' stroke='%23555' stroke-width='2'/%3E%3Cpath d='M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62' fill='none' stroke='%23c8c2b6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='30' y1='62' x2='90' y2='62' stroke='%23c8c2b6' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='78' r='4' fill='%2300cc00'/%3E%3C/svg%3E">
-    <title>Maestro Rhythm King MRK-2</title>
+    <title>Rhythm Knight MK-2</title>
     <style>
         * {
             margin: 0;
@@ -1977,8 +1977,8 @@
             <!-- Metallic ring -->
             <circle cx="60" cy="60" r="56" fill="none" stroke="#666" stroke-width="0.5"/>
         </svg>
-        <div class="splash-title">Rhythm King</div>
-        <div class="splash-subtitle">Maestro MRK-2</div>
+        <div class="splash-title">Rhythm Knight</div>
+        <div class="splash-subtitle">MK-2</div>
         <div class="splash-loader"><div class="splash-loader-bar"></div></div>
     </div>
 
@@ -1998,8 +1998,8 @@
                 <path d="M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62" fill="none" stroke="#c8c2b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <line x1="30" y1="62" x2="90" y2="62" stroke="#c8c2b6" stroke-width="1.5" stroke-linecap="round"/>
                 <circle cx="60" cy="78" r="3" fill="#00cc00" opacity="0.9"/>
-            </svg><h1 class="machine-title" style="display:inline;">Rhythm King</h1>
-            <p class="machine-subtitle">Maestro MRK-2</p>
+            </svg><h1 class="machine-title" style="display:inline;">Rhythm Knight</h1>
+            <p class="machine-subtitle">MK-2</p>
             <button class="menu-button" id="menuButton">
                 <span></span>
                 <span></span>
@@ -2041,7 +2041,7 @@
                     <span class="menu-icon">&#x1F4E5;</span>
                     <span>Import File...</span>
                 </label>
-                <input type="file" id="importProjectFile" accept=".mrk2" style="display: none;">
+                <input type="file" id="importProjectFile" accept=".mk2" style="display: none;">
                 <button class="menu-item" id="shareProjectBtn">
                     <span class="menu-icon">&#x1F517;</span>
                     <span>Share Link</span>
@@ -2085,7 +2085,7 @@
             </div>
 
             <div class="menu-footer">
-                <span class="menu-version">MRK-2 v2.0</span>
+                <span class="menu-version">MK-2 v2.0</span>
             </div>
         </div>
 
@@ -3759,12 +3759,12 @@
         if (index > -1) recentProjectIds.splice(index, 1);
         recentProjectIds.unshift(projectId);
         recentProjectIds = recentProjectIds.slice(0, 5);
-        try { localStorage.setItem('mrk2_recent', JSON.stringify(recentProjectIds)); } catch (e) {}
+        try { localStorage.setItem('mk2_recent', JSON.stringify(recentProjectIds)); } catch (e) {}
     }
 
     function loadRecentProjects() {
         try {
-            var stored = localStorage.getItem('mrk2_recent');
+            var stored = localStorage.getItem('mk2_recent');
             if (stored) recentProjectIds = JSON.parse(stored);
         } catch (e) { recentProjectIds = []; }
     }
@@ -3825,7 +3825,7 @@
         updateRecentProjects(currentProjectId);
         saveProjectsToStorage();
         displayRecentProjects();
-        document.title = projectName + ' - Maestro Rhythm King MRK-2';
+        document.title = projectName + ' - Rhythm Knight MK-2';
 
         var saveBtn = document.getElementById('saveProjectBtn');
         var originalText = saveBtn.innerHTML;
@@ -3896,7 +3896,7 @@
         document.getElementById('swingDisplay').textContent = swing + '%';
         document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
         document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
-        document.title = project.name + ' - Maestro Rhythm King MRK-2';
+        document.title = project.name + ' - Rhythm Knight MK-2';
 
         for (var i = 0; i < 8; i++) updatePatternHasData(i);
         if (editMode && isCustomPattern) renderSequencer();
@@ -3932,13 +3932,13 @@
                 groove: grooveAmount,
                 patterns: JSON.parse(JSON.stringify(customPatterns)),
                 version: '2.0',
-                type: 'MRK2_PROJECT'
+                type: 'MK2_PROJECT'
             };
 
             var dataBlob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
             var link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = (input.value || 'My_Project').replace(/[^a-z0-9]/gi, '_') + '.mrk2';
+            link.download = (input.value || 'My_Project').replace(/[^a-z0-9]/gi, '_') + '.mk2';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -3957,7 +3957,7 @@
         reader.onload = function(e) {
             try {
                 var projectData = JSON.parse(e.target.result);
-                if (projectData.type !== 'MRK2_PROJECT') throw new Error('Invalid project file');
+                if (projectData.type !== 'MK2_PROJECT') throw new Error('Invalid project file');
 
                 ensurePatternStructure(projectData.patterns);
                 currentProjectId = generateProjectId();
@@ -3980,7 +3980,7 @@
                 closeMenu();
                 showToast('Project "' + projectData.name + '" imported');
             } catch (error) {
-                alert('Error importing project file. Please make sure it\'s a valid .mrk2 file.');
+                alert('Error importing project file. Please make sure it\'s a valid .mk2 file.');
             }
         };
         reader.readAsText(file);
@@ -3997,7 +3997,7 @@
 
         var projectName = 'New Project ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         document.getElementById('projectNameInput').value = projectName;
-        document.title = projectName + ' - Maestro Rhythm King MRK-2';
+        document.title = projectName + ' - Rhythm Knight MK-2';
         saveProject();
         if (editMode && isCustomPattern) renderSequencer();
         displayRecentProjects();
@@ -4007,7 +4007,7 @@
 
     function shareProject() {
         var shareData = {
-            name: document.getElementById('projectNameInput').value || 'MRK-2 Project',
+            name: document.getElementById('projectNameInput').value || 'MK-2 Project',
             tempo: tempo,
             swing: swing,
             groove: grooveAmount,
@@ -4101,12 +4101,12 @@
     }
 
     function saveProjectsToStorage() {
-        try { localStorage.setItem('mrk2_projects', JSON.stringify(savedProjects)); } catch (e) {}
+        try { localStorage.setItem('mk2_projects', JSON.stringify(savedProjects)); } catch (e) {}
     }
 
     function loadProjectsFromStorage() {
         try {
-            var stored = localStorage.getItem('mrk2_projects');
+            var stored = localStorage.getItem('mk2_projects');
             if (stored) savedProjects = JSON.parse(stored);
             loadRecentProjects();
             displayRecentProjects();
@@ -4211,7 +4211,7 @@
 
         var blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
         var url = URL.createObjectURL(blob);
-        var projectName = document.getElementById('projectNameInput').value || 'MRK2_Recording';
+        var projectName = document.getElementById('projectNameInput').value || 'MK2_Recording';
         var timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
 
         var a = document.createElement('a');
@@ -4569,7 +4569,7 @@
             splash.classList.add('fade-out');
             setTimeout(function() {
                 splash.remove();
-                if (!localStorage.getItem('mrk2_onboarded')) {
+                if (!localStorage.getItem('mk2_onboarded')) {
                     showOnboarding();
                 }
             }, 600);
@@ -4679,7 +4679,7 @@
     }
 
     function finishOnboarding() {
-        localStorage.setItem('mrk2_onboarded', '1');
+        localStorage.setItem('mk2_onboarded', '1');
         var overlay = document.getElementById('onboardingOverlay');
         overlay.classList.remove('active');
         // Use this user gesture to pre-unlock the AudioContext
