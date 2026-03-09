@@ -2331,7 +2331,7 @@
     let currentStep = 0;
     let timerID;
     let volume = 0.7;
-    let balance = 0.5;
+    let balance = 0.5; // Tone: 0 = dark/muffled, 1 = bright/crisp
     let grooveAmount = 0; // -1.0 (laid back) to +1.0 (on top)
 
     var GROOVE_PROFILES = {
@@ -2411,6 +2411,7 @@
     }
 
     // Initialize audio context on first user interaction
+    var _initAudioPromise = null;
     function initAudio() {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -2420,18 +2421,18 @@
             analyser.fftSize = 256;
             analyser.connect(audioContext.destination);
 
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-
             if (!drumSynth) {
                 drumSynth = new AnalogDrumSynth(audioContext);
                 drumSynth.setVolume(volume);
             }
 
             startWaveformVisualizer();
-        } else if (audioContext.state === 'suspended') {
-            audioContext.resume();
+        }
+        // Always try to resume — returns a promise we can await in togglePlay
+        if (audioContext.state === 'suspended') {
+            _initAudioPromise = audioContext.resume().then(function() { _initAudioPromise = null; });
+        } else {
+            _initAudioPromise = null;
         }
     }
 
@@ -2507,6 +2508,15 @@
     window.addEventListener('pageshow', function() { resumeAudioPlayback(); });
     window.addEventListener('focus', function() { resumeAudioPlayback(); });
 
+    // Pre-warm AudioContext on first user gesture so Play works immediately
+    function _preWarmAudio() {
+        if (!audioContext) initAudio();
+        document.removeEventListener('click', _preWarmAudio);
+        document.removeEventListener('touchstart', _preWarmAudio);
+    }
+    document.addEventListener('click', _preWarmAudio, { once: true });
+    document.addEventListener('touchstart', _preWarmAudio, { passive: true, once: true });
+
     // iOS sometimes needs a user gesture to unlock audio after background
     document.addEventListener('touchstart', function() {
         if (audioContext && audioContext.state === 'suspended') {
@@ -2533,12 +2543,31 @@
         constructor(context) {
             this.context = context;
             this.masterGain = context.createGain();
-            // Connect through analyser for visualization
+            // Master tone filter — sweeps from dark to bright
+            this.toneFilter = context.createBiquadFilter();
+            this.toneFilter.type = 'lowpass';
+            this.toneFilter.Q.value = 0.7;
+            this._updateToneFilter();
+            // Chain: masterGain → toneFilter → analyser/destination
+            this.masterGain.connect(this.toneFilter);
             if (analyser) {
-                this.masterGain.connect(analyser);
+                this.toneFilter.connect(analyser);
             } else {
-                this.masterGain.connect(context.destination);
+                this.toneFilter.connect(context.destination);
             }
+            // Pre-generate shared noise buffers (performance)
+            this._noiseShort = context.createBuffer(1, 4096, context.sampleRate);
+            var d = this._noiseShort.getChannelData(0);
+            for (var i = 0; i < 4096; i++) d[i] = Math.random() * 2 - 1;
+            this._noiseLong = context.createBuffer(1, Math.ceil(context.sampleRate * 0.5), context.sampleRate);
+            var d2 = this._noiseLong.getChannelData(0);
+            for (var i = 0; i < d2.length; i++) d2[i] = Math.random() * 2 - 1;
+        }
+
+        _updateToneFilter() {
+            // balance 0 → 800 Hz (dark/muffled), balance 1 → 20000 Hz (bright/open)
+            var freq = 800 * Math.pow(25, balance);
+            this.toneFilter.frequency.value = Math.min(freq, 20000);
         }
 
         setVolume(value) {
@@ -2547,13 +2576,13 @@
 
         connectToRecorder(destination) {
             if (destination) {
-                this.masterGain.connect(destination);
+                this.toneFilter.connect(destination);
             }
         }
 
         kick(time, variant) {
             variant = variant || 1;
-            var kickLevel = 1 - (balance * 0.5);
+            var kickLevel = 1;
 
             if (variant === 1) {
                 // KICK 1: Classic tight kick - punchy mid-bass, quick decay
@@ -2639,14 +2668,7 @@
 
         snare(time) {
             var noise = this.context.createBufferSource();
-            var noiseBuffer = this.context.createBuffer(1, 4096, this.context.sampleRate);
-            var data = noiseBuffer.getChannelData(0);
-
-            for (var i = 0; i < 4096; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noise.buffer = noiseBuffer;
+            noise.buffer = this._noiseShort;
 
             var filter = this.context.createBiquadFilter();
             filter.type = 'highpass';
@@ -2688,12 +2710,7 @@
                 var startTime = time + (i * clapSpacing);
 
                 var noise = this.context.createBufferSource();
-                var noiseBuffer = this.context.createBuffer(1, 512, this.context.sampleRate);
-                var data = noiseBuffer.getChannelData(0);
-                for (var j = 0; j < 512; j++) {
-                    data[j] = Math.random() * 2 - 1;
-                }
-                noise.buffer = noiseBuffer;
+                noise.buffer = this._noiseShort;
 
                 var filter = this.context.createBiquadFilter();
                 filter.type = 'bandpass';
@@ -2718,12 +2735,7 @@
 
             // Sharp transient snap
             var snap = this.context.createBufferSource();
-            var snapBuffer = this.context.createBuffer(1, 256, this.context.sampleRate);
-            var snapData = snapBuffer.getChannelData(0);
-            for (var k = 0; k < 256; k++) {
-                snapData[k] = Math.random() * 2 - 1;
-            }
-            snap.buffer = snapBuffer;
+            snap.buffer = this._noiseShort;
 
             var snapFilter = this.context.createBiquadFilter();
             snapFilter.type = 'highpass';
@@ -2743,15 +2755,7 @@
 
         hihat(time, open) {
             var noise = this.context.createBufferSource();
-            var noiseBuffer = this.context.createBuffer(1, 4096, this.context.sampleRate);
-            var data = noiseBuffer.getChannelData(0);
-            var hihatLevel = 0.5 + (balance * 0.5);
-
-            for (var i = 0; i < 4096; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noise.buffer = noiseBuffer;
+            noise.buffer = this._noiseShort;
 
             var filter = this.context.createBiquadFilter();
             filter.type = 'highpass';
@@ -2766,7 +2770,7 @@
             var gain = this.context.createGain();
             var duration = open ? 0.3 : 0.05;
 
-            gain.gain.setValueAtTime(0.2 * hihatLevel, time);
+            gain.gain.setValueAtTime(0.2, time);
             gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
 
             noise.connect(filter);
@@ -2780,15 +2784,7 @@
 
         cymbal(time) {
             var noise = this.context.createBufferSource();
-            var noiseBuffer = this.context.createBuffer(1, this.context.sampleRate * 0.5, this.context.sampleRate);
-            var data = noiseBuffer.getChannelData(0);
-            var cymbalLevel = 0.5 + (balance * 0.5);
-
-            for (var i = 0; i < noiseBuffer.length; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noise.buffer = noiseBuffer;
+            noise.buffer = this._noiseLong;
 
             var filter = this.context.createBiquadFilter();
             filter.type = 'highpass';
@@ -2796,7 +2792,7 @@
             filter.Q.value = 0.5;
 
             var gain = this.context.createGain();
-            gain.gain.setValueAtTime(0.3 * cymbalLevel, time);
+            gain.gain.setValueAtTime(0.3, time);
             gain.gain.exponentialRampToValueAtTime(0.01, time + 1);
 
             noise.connect(filter);
@@ -2813,7 +2809,7 @@
                 osc.type = 'sine';
                 osc.frequency.value = 5000 + (j * 1000);
 
-                oscGain.gain.setValueAtTime(0.05 * cymbalLevel, time);
+                oscGain.gain.setValueAtTime(0.05, time);
                 oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
 
                 osc.connect(oscGain);
@@ -3104,28 +3100,30 @@
         currentStep = (currentStep + 1) % 16;
     }
 
+    // Cache DOM references for the hot path (performance)
+    var _tapBtn = document.getElementById('tapTempoBtn');
+    var _beatIndicators = null;
+
     function updateVisualizer(step) {
         requestAnimationFrame(function() {
             // Blink tap button on quarter notes (every 4 steps)
-            if (step % 4 === 0) {
-                var tapBtn = document.getElementById('tapTempoBtn');
-                if (tapBtn) {
-                    tapBtn.classList.add('beat-blink');
-                    setTimeout(function() { tapBtn.classList.remove('beat-blink'); }, 80);
-                }
+            if (step % 4 === 0 && _tapBtn) {
+                _tapBtn.classList.add('beat-blink');
+                setTimeout(function() { _tapBtn.classList.remove('beat-blink'); }, 80);
             }
-            var indicators = document.querySelectorAll('.beat-indicator');
-            indicators.forEach(function(ind, i) {
-                if (i === step) {
-                    ind.classList.add('active');
-                    setTimeout(function() { ind.classList.remove('active'); }, 100);
-                }
-            });
+            // Lazy-cache beat indicators (rebuilt when visualizer inits)
+            if (!_beatIndicators) _beatIndicators = document.querySelectorAll('.beat-indicator');
+            var ind = _beatIndicators[step];
+            if (ind) {
+                ind.classList.add('active');
+                setTimeout(function() { ind.classList.remove('active'); }, 100);
+            }
         });
     }
 
     // Initialize visualizer
     function initVisualizer() {
+        _beatIndicators = null; // invalidate cache
         var beatOverlay = document.getElementById('beatOverlay');
         beatOverlay.innerHTML = '';
         for (var i = 0; i < 16; i++) {
@@ -3154,9 +3152,19 @@
                 if (discoBtn) discoBtn.classList.add('active');
             }
 
-            currentStep = 0;
-            nextNoteTime = audioContext.currentTime;
-            scheduler();
+            // Wait for AudioContext to be running before scheduling
+            function startScheduler() {
+                currentStep = 0;
+                nextNoteTime = audioContext.currentTime + 0.05;
+                scheduler();
+            }
+
+            if (_initAudioPromise) {
+                _initAudioPromise.then(startScheduler);
+            } else {
+                startScheduler();
+            }
+
             playBtn.textContent = 'Stop';
             playBtn.classList.add('playing');
             document.querySelector('.power-indicator').classList.add('on');
@@ -3262,9 +3270,10 @@
         if (vv) vv.textContent = e.target.value;
     });
 
-    // Balance control
+    // Tone control (balance variable: 0 = dark, 1 = bright)
     document.getElementById('balanceSlider').addEventListener('input', function(e) {
         balance = e.target.value / 100;
+        if (drumSynth) drumSynth._updateToneFilter();
     });
 
     // Tempo control
@@ -3400,23 +3409,25 @@
         });
 
         // Observe programmatic .value changes via polling (for tempo sync etc)
+        // Cache wrapper/slider pairs to avoid DOM queries every tick
+        var _knobCache = [];
+        document.querySelectorAll('.knob-wrapper').forEach(function(wrapper) {
+            var sliderId = wrapper.dataset.slider;
+            var slider = document.getElementById(sliderId);
+            var indicator = wrapper.querySelector('.knob-indicator');
+            if (slider && indicator) _knobCache.push({ slider: slider, indicator: indicator, id: sliderId });
+        });
         setInterval(function() {
-            document.querySelectorAll('.knob-wrapper').forEach(function(wrapper) {
-                var sliderId = wrapper.dataset.slider;
-                var slider = document.getElementById(sliderId);
-                if (!slider) return;
-                var currentAngle = startAngle + getSliderNorm(slider) * knobAngleRange;
-                var indicator = wrapper.querySelector('.knob-indicator');
-                if (indicator) {
-                    var displayed = indicator.style.transform;
-                    var expected = 'rotate(' + currentAngle + 'deg)';
-                    if (displayed !== expected) {
-                        indicator.style.transform = expected;
-                        updateKnobValue(sliderId, slider.value);
-                    }
+            for (var i = 0; i < _knobCache.length; i++) {
+                var entry = _knobCache[i];
+                var currentAngle = startAngle + getSliderNorm(entry.slider) * knobAngleRange;
+                var expected = 'rotate(' + currentAngle + 'deg)';
+                if (entry.indicator.style.transform !== expected) {
+                    entry.indicator.style.transform = expected;
+                    updateKnobValue(entry.id, entry.slider.value);
                 }
-            });
-        }, 200);
+            }
+        }, 500);
     })();
 
     // Rhythm selection
