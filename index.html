@@ -2193,6 +2193,99 @@
         }
     }
 
+    // iOS audio recovery: Safari/WKWebView suspends AudioContext when page
+    // goes to background. ctx.resume() can resolve while audio stays dead,
+    // so we teardown and rebuild, then validate via currentTime advancement.
+    var _resumeInFlight = false;
+
+    function teardownAudio() {
+        clearTimeout(timerID);
+        if (waveformAnimationId) { cancelAnimationFrame(waveformAnimationId); waveformAnimationId = null; }
+        if (audioContext) { try { audioContext.close(); } catch(e) {} }
+        audioContext = null;
+        analyser = null;
+        drumSynth = null;
+    }
+
+    function resumeAudioPlayback() {
+        if (!audioContext && !isPlaying) return;
+        if (_resumeInFlight) return;
+        _resumeInFlight = true;
+        setTimeout(function() { _resumeInFlight = false; }, 500);
+
+        var wasPlaying = isPlaying;
+        if (isPlaying) { isPlaying = false; clearTimeout(timerID); }
+        teardownAudio();
+
+        var attempt = 0;
+        var delays = [100, 500, 1500];
+
+        function tryResume() {
+            attempt++;
+            initAudio();
+            if (!audioContext) return;
+
+            audioContext.resume().then(function() {
+                if (!audioContext) return;
+                var t0 = audioContext.currentTime;
+                setTimeout(function() {
+                    if (!audioContext) return;
+                    var t1 = audioContext.currentTime;
+                    if (t1 > t0 || audioContext.state === 'running') {
+                        // Audio is truly alive — restart sequencer if needed
+                        if (wasPlaying) {
+                            isPlaying = true;
+                            nextNoteTime = audioContext.currentTime + 0.05;
+                            scheduler();
+                        }
+                    } else if (attempt < delays.length) {
+                        teardownAudio();
+                        setTimeout(tryResume, delays[attempt]);
+                    } else {
+                        showToast('Tap anywhere to resume audio');
+                    }
+                }, 200);
+            }).catch(function() {
+                if (attempt < delays.length) {
+                    teardownAudio();
+                    setTimeout(tryResume, delays[attempt]);
+                } else {
+                    showToast('Tap anywhere to resume audio');
+                }
+            });
+        }
+
+        setTimeout(tryResume, delays[0]);
+    }
+
+    // Trigger recovery when page becomes visible again
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') resumeAudioPlayback();
+    });
+    window.addEventListener('pageshow', function() { resumeAudioPlayback(); });
+    window.addEventListener('focus', function() { resumeAudioPlayback(); });
+
+    // iOS sometimes needs a user gesture to unlock audio after background
+    document.addEventListener('touchstart', function() {
+        if (audioContext && audioContext.state === 'suspended') {
+            _resumeInFlight = false;
+            resumeAudioPlayback();
+        }
+    }, { passive: true });
+
+    // Periodic health check: detect frozen currentTime even when state says 'running'
+    var _lastCtxTime = 0, _lastCheckAt = 0;
+    setInterval(function() {
+        if (!audioContext || !isPlaying) { _lastCtxTime = 0; return; }
+        var now = performance.now();
+        if (now - _lastCheckAt < 4500) return;
+        _lastCheckAt = now;
+        if (_lastCtxTime > 0 && audioContext.currentTime === _lastCtxTime && audioContext.state !== 'suspended') {
+            resumeAudioPlayback();
+        }
+        _lastCtxTime = audioContext.currentTime;
+    }, 5000);
+
     // Analog-style drum synthesis
     class AnalogDrumSynth {
         constructor(context) {
