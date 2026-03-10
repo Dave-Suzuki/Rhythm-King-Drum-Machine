@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Rhythm King">
+    <meta name="apple-mobile-web-app-title" content="Rhythm Knight">
     <meta name="theme-color" content="#1a1a2e">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='60' cy='60' r='56' fill='%231a1a1a' stroke='%23555' stroke-width='2'/%3E%3Cpath d='M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62' fill='none' stroke='%23c8c2b6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='30' y1='62' x2='90' y2='62' stroke='%23c8c2b6' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='78' r='4' fill='%2300cc00'/%3E%3C/svg%3E">
-    <title>Maestro Rhythm King MRK-2</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='60' cy='60' r='56' fill='none' stroke='%23444' stroke-width='2'/%3E%3Ccircle cx='60' cy='60' r='52' fill='none' stroke='%23333' stroke-width='1'/%3E%3Ccircle cx='60' cy='60' r='50' fill='%231a1a1a'/%3E%3Cpath d='M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62' fill='none' stroke='%23c8c2b6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='30' y1='62' x2='90' y2='62' stroke='%23c8c2b6' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='60' cy='78' r='3' fill='%2300cc00' opacity='0.9'/%3E%3Ccircle cx='60' cy='60' r='56' fill='none' stroke='%23666' stroke-width='0.5'/%3E%3C/svg%3E">
+    <title>Rhythm Knight MK-2</title>
     <style>
         * {
             margin: 0;
@@ -1518,13 +1518,15 @@
             .knobs-half {
                 order: 2;
                 width: 100%;
-                gap: 8px;
+                gap: 2px;
             }
 
             .control-label {
                 font-size: 0.5em;
                 letter-spacing: 0.5px;
                 margin-bottom: 2px;
+                white-space: nowrap;
+                overflow: visible;
             }
 
             .knob-wrapper {
@@ -1568,8 +1570,8 @@
 
             .pattern-btn {
                 flex: 1;
-                min-width: 55px;
-                padding: 10px 6px;
+                min-width: 0;
+                padding: 10px 4px;
                 font-size: 0.7em;
             }
 
@@ -1977,8 +1979,8 @@
             <!-- Metallic ring -->
             <circle cx="60" cy="60" r="56" fill="none" stroke="#666" stroke-width="0.5"/>
         </svg>
-        <div class="splash-title">Rhythm King</div>
-        <div class="splash-subtitle">Maestro MRK-2</div>
+        <div class="splash-title">Rhythm Knight</div>
+        <div class="splash-subtitle">MK-2</div>
         <div class="splash-loader"><div class="splash-loader-bar"></div></div>
     </div>
 
@@ -1998,8 +2000,8 @@
                 <path d="M30 62 L38 42 L46 56 L54 38 L60 50 L66 38 L74 56 L82 42 L90 62" fill="none" stroke="#c8c2b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <line x1="30" y1="62" x2="90" y2="62" stroke="#c8c2b6" stroke-width="1.5" stroke-linecap="round"/>
                 <circle cx="60" cy="78" r="3" fill="#00cc00" opacity="0.9"/>
-            </svg><h1 class="machine-title" style="display:inline;">Rhythm King</h1>
-            <p class="machine-subtitle">Maestro MRK-2</p>
+            </svg><h1 class="machine-title" style="display:inline;">Rhythm Knight</h1>
+            <p class="machine-subtitle">MK-2</p>
             <button class="menu-button" id="menuButton">
                 <span></span>
                 <span></span>
@@ -2041,7 +2043,7 @@
                     <span class="menu-icon">&#x1F4E5;</span>
                     <span>Import File...</span>
                 </label>
-                <input type="file" id="importProjectFile" accept=".mrk2" style="display: none;">
+                <input type="file" id="importProjectFile" accept=".mk2" style="display: none;">
                 <button class="menu-item" id="shareProjectBtn">
                     <span class="menu-icon">&#x1F517;</span>
                     <span>Share Link</span>
@@ -2085,7 +2087,7 @@
             </div>
 
             <div class="menu-footer">
-                <span class="menu-version">MRK-2 v2.0</span>
+                <span class="menu-version">MK-2 v2.0</span>
             </div>
         </div>
 
@@ -2331,7 +2333,7 @@
     let currentStep = 0;
     let timerID;
     let volume = 0.7;
-    let balance = 0.5;
+    let balance = 0.5; // Tone: 0 = dark/muffled, 1 = bright/crisp
     let grooveAmount = 0; // -1.0 (laid back) to +1.0 (on top)
 
     var GROOVE_PROFILES = {
@@ -2378,11 +2380,8 @@
     let recentProjectIds = [];
 
     // Recording variables
-    let mediaRecorder = null;
-    let recordedChunks = [];
     let recordingStartTime = 0;
     let recordingInterval = null;
-    let streamDestination = null;
 
     // Waveform visualizer
     let analyser = null;
@@ -2411,6 +2410,7 @@
     }
 
     // Initialize audio context on first user interaction
+    var _initAudioPromise = null;
     function initAudio() {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -2420,18 +2420,18 @@
             analyser.fftSize = 256;
             analyser.connect(audioContext.destination);
 
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-
             if (!drumSynth) {
                 drumSynth = new AnalogDrumSynth(audioContext);
                 drumSynth.setVolume(volume);
             }
 
             startWaveformVisualizer();
-        } else if (audioContext.state === 'suspended') {
-            audioContext.resume();
+        }
+        // Always try to resume — returns a promise we can await in togglePlay
+        if (audioContext.state === 'suspended') {
+            _initAudioPromise = audioContext.resume().then(function() { _initAudioPromise = null; });
+        } else {
+            _initAudioPromise = null;
         }
     }
 
@@ -2507,6 +2507,15 @@
     window.addEventListener('pageshow', function() { resumeAudioPlayback(); });
     window.addEventListener('focus', function() { resumeAudioPlayback(); });
 
+    // Pre-warm AudioContext on first user gesture so Play works immediately
+    function _preWarmAudio() {
+        if (!audioContext) initAudio();
+        document.removeEventListener('click', _preWarmAudio);
+        document.removeEventListener('touchstart', _preWarmAudio);
+    }
+    document.addEventListener('click', _preWarmAudio, { once: true });
+    document.addEventListener('touchstart', _preWarmAudio, { passive: true, once: true });
+
     // iOS sometimes needs a user gesture to unlock audio after background
     document.addEventListener('touchstart', function() {
         if (audioContext && audioContext.state === 'suspended') {
@@ -2533,12 +2542,31 @@
         constructor(context) {
             this.context = context;
             this.masterGain = context.createGain();
-            // Connect through analyser for visualization
+            // Master tone filter — sweeps from dark to bright
+            this.toneFilter = context.createBiquadFilter();
+            this.toneFilter.type = 'lowpass';
+            this.toneFilter.Q.value = 0.7;
+            this._updateToneFilter();
+            // Chain: masterGain → toneFilter → analyser/destination
+            this.masterGain.connect(this.toneFilter);
             if (analyser) {
-                this.masterGain.connect(analyser);
+                this.toneFilter.connect(analyser);
             } else {
-                this.masterGain.connect(context.destination);
+                this.toneFilter.connect(context.destination);
             }
+            // Pre-generate shared noise buffers (performance)
+            this._noiseShort = context.createBuffer(1, 4096, context.sampleRate);
+            var d = this._noiseShort.getChannelData(0);
+            for (var i = 0; i < 4096; i++) d[i] = Math.random() * 2 - 1;
+            this._noiseLong = context.createBuffer(1, Math.ceil(context.sampleRate * 0.5), context.sampleRate);
+            var d2 = this._noiseLong.getChannelData(0);
+            for (var i = 0; i < d2.length; i++) d2[i] = Math.random() * 2 - 1;
+        }
+
+        _updateToneFilter() {
+            // balance 0 → 800 Hz (dark/muffled), balance 1 → 20000 Hz (bright/open)
+            var freq = 800 * Math.pow(25, balance);
+            this.toneFilter.frequency.value = Math.min(freq, 20000);
         }
 
         setVolume(value) {
@@ -2546,14 +2574,12 @@
         }
 
         connectToRecorder(destination) {
-            if (destination) {
-                this.masterGain.connect(destination);
-            }
+            if (destination) this.toneFilter.connect(destination);
         }
 
         kick(time, variant) {
             variant = variant || 1;
-            var kickLevel = 1 - (balance * 0.5);
+            var kickLevel = 1;
 
             if (variant === 1) {
                 // KICK 1: Classic tight kick - punchy mid-bass, quick decay
@@ -2639,14 +2665,7 @@
 
         snare(time) {
             var noise = this.context.createBufferSource();
-            var noiseBuffer = this.context.createBuffer(1, 4096, this.context.sampleRate);
-            var data = noiseBuffer.getChannelData(0);
-
-            for (var i = 0; i < 4096; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noise.buffer = noiseBuffer;
+            noise.buffer = this._noiseShort;
 
             var filter = this.context.createBiquadFilter();
             filter.type = 'highpass';
@@ -2688,12 +2707,7 @@
                 var startTime = time + (i * clapSpacing);
 
                 var noise = this.context.createBufferSource();
-                var noiseBuffer = this.context.createBuffer(1, 512, this.context.sampleRate);
-                var data = noiseBuffer.getChannelData(0);
-                for (var j = 0; j < 512; j++) {
-                    data[j] = Math.random() * 2 - 1;
-                }
-                noise.buffer = noiseBuffer;
+                noise.buffer = this._noiseShort;
 
                 var filter = this.context.createBiquadFilter();
                 filter.type = 'bandpass';
@@ -2718,12 +2732,7 @@
 
             // Sharp transient snap
             var snap = this.context.createBufferSource();
-            var snapBuffer = this.context.createBuffer(1, 256, this.context.sampleRate);
-            var snapData = snapBuffer.getChannelData(0);
-            for (var k = 0; k < 256; k++) {
-                snapData[k] = Math.random() * 2 - 1;
-            }
-            snap.buffer = snapBuffer;
+            snap.buffer = this._noiseShort;
 
             var snapFilter = this.context.createBiquadFilter();
             snapFilter.type = 'highpass';
@@ -2743,15 +2752,7 @@
 
         hihat(time, open) {
             var noise = this.context.createBufferSource();
-            var noiseBuffer = this.context.createBuffer(1, 4096, this.context.sampleRate);
-            var data = noiseBuffer.getChannelData(0);
-            var hihatLevel = 0.5 + (balance * 0.5);
-
-            for (var i = 0; i < 4096; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noise.buffer = noiseBuffer;
+            noise.buffer = this._noiseShort;
 
             var filter = this.context.createBiquadFilter();
             filter.type = 'highpass';
@@ -2766,7 +2767,7 @@
             var gain = this.context.createGain();
             var duration = open ? 0.3 : 0.05;
 
-            gain.gain.setValueAtTime(0.2 * hihatLevel, time);
+            gain.gain.setValueAtTime(0.2, time);
             gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
 
             noise.connect(filter);
@@ -2780,15 +2781,7 @@
 
         cymbal(time) {
             var noise = this.context.createBufferSource();
-            var noiseBuffer = this.context.createBuffer(1, this.context.sampleRate * 0.5, this.context.sampleRate);
-            var data = noiseBuffer.getChannelData(0);
-            var cymbalLevel = 0.5 + (balance * 0.5);
-
-            for (var i = 0; i < noiseBuffer.length; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noise.buffer = noiseBuffer;
+            noise.buffer = this._noiseLong;
 
             var filter = this.context.createBiquadFilter();
             filter.type = 'highpass';
@@ -2796,7 +2789,7 @@
             filter.Q.value = 0.5;
 
             var gain = this.context.createGain();
-            gain.gain.setValueAtTime(0.3 * cymbalLevel, time);
+            gain.gain.setValueAtTime(0.3, time);
             gain.gain.exponentialRampToValueAtTime(0.01, time + 1);
 
             noise.connect(filter);
@@ -2813,7 +2806,7 @@
                 osc.type = 'sine';
                 osc.frequency.value = 5000 + (j * 1000);
 
-                oscGain.gain.setValueAtTime(0.05 * cymbalLevel, time);
+                oscGain.gain.setValueAtTime(0.05, time);
                 oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
 
                 osc.connect(oscGain);
@@ -3104,28 +3097,30 @@
         currentStep = (currentStep + 1) % 16;
     }
 
+    // Cache DOM references for the hot path (performance)
+    var _tapBtn = document.getElementById('tapTempoBtn');
+    var _beatIndicators = null;
+
     function updateVisualizer(step) {
         requestAnimationFrame(function() {
             // Blink tap button on quarter notes (every 4 steps)
-            if (step % 4 === 0) {
-                var tapBtn = document.getElementById('tapTempoBtn');
-                if (tapBtn) {
-                    tapBtn.classList.add('beat-blink');
-                    setTimeout(function() { tapBtn.classList.remove('beat-blink'); }, 80);
-                }
+            if (step % 4 === 0 && _tapBtn) {
+                _tapBtn.classList.add('beat-blink');
+                setTimeout(function() { _tapBtn.classList.remove('beat-blink'); }, 80);
             }
-            var indicators = document.querySelectorAll('.beat-indicator');
-            indicators.forEach(function(ind, i) {
-                if (i === step) {
-                    ind.classList.add('active');
-                    setTimeout(function() { ind.classList.remove('active'); }, 100);
-                }
-            });
+            // Lazy-cache beat indicators (rebuilt when visualizer inits)
+            if (!_beatIndicators) _beatIndicators = document.querySelectorAll('.beat-indicator');
+            var ind = _beatIndicators[step];
+            if (ind) {
+                ind.classList.add('active');
+                setTimeout(function() { ind.classList.remove('active'); }, 100);
+            }
         });
     }
 
     // Initialize visualizer
     function initVisualizer() {
+        _beatIndicators = null; // invalidate cache
         var beatOverlay = document.getElementById('beatOverlay');
         beatOverlay.innerHTML = '';
         for (var i = 0; i < 16; i++) {
@@ -3154,9 +3149,19 @@
                 if (discoBtn) discoBtn.classList.add('active');
             }
 
-            currentStep = 0;
-            nextNoteTime = audioContext.currentTime;
-            scheduler();
+            // Wait for AudioContext to be running before scheduling
+            function startScheduler() {
+                currentStep = 0;
+                nextNoteTime = audioContext.currentTime + 0.05;
+                scheduler();
+            }
+
+            if (_initAudioPromise) {
+                _initAudioPromise.then(startScheduler);
+            } else {
+                startScheduler();
+            }
+
             playBtn.textContent = 'Stop';
             playBtn.classList.add('playing');
             document.querySelector('.power-indicator').classList.add('on');
@@ -3262,9 +3267,10 @@
         if (vv) vv.textContent = e.target.value;
     });
 
-    // Balance control
+    // Tone control (balance variable: 0 = dark, 1 = bright)
     document.getElementById('balanceSlider').addEventListener('input', function(e) {
         balance = e.target.value / 100;
+        if (drumSynth) drumSynth._updateToneFilter();
     });
 
     // Tempo control
@@ -3400,23 +3406,25 @@
         });
 
         // Observe programmatic .value changes via polling (for tempo sync etc)
+        // Cache wrapper/slider pairs to avoid DOM queries every tick
+        var _knobCache = [];
+        document.querySelectorAll('.knob-wrapper').forEach(function(wrapper) {
+            var sliderId = wrapper.dataset.slider;
+            var slider = document.getElementById(sliderId);
+            var indicator = wrapper.querySelector('.knob-indicator');
+            if (slider && indicator) _knobCache.push({ slider: slider, indicator: indicator, id: sliderId });
+        });
         setInterval(function() {
-            document.querySelectorAll('.knob-wrapper').forEach(function(wrapper) {
-                var sliderId = wrapper.dataset.slider;
-                var slider = document.getElementById(sliderId);
-                if (!slider) return;
-                var currentAngle = startAngle + getSliderNorm(slider) * knobAngleRange;
-                var indicator = wrapper.querySelector('.knob-indicator');
-                if (indicator) {
-                    var displayed = indicator.style.transform;
-                    var expected = 'rotate(' + currentAngle + 'deg)';
-                    if (displayed !== expected) {
-                        indicator.style.transform = expected;
-                        updateKnobValue(sliderId, slider.value);
-                    }
+            for (var i = 0; i < _knobCache.length; i++) {
+                var entry = _knobCache[i];
+                var currentAngle = startAngle + getSliderNorm(entry.slider) * knobAngleRange;
+                var expected = 'rotate(' + currentAngle + 'deg)';
+                if (entry.indicator.style.transform !== expected) {
+                    entry.indicator.style.transform = expected;
+                    updateKnobValue(entry.id, entry.slider.value);
                 }
-            });
-        }, 200);
+            }
+        }, 500);
     })();
 
     // Rhythm selection
@@ -3759,12 +3767,12 @@
         if (index > -1) recentProjectIds.splice(index, 1);
         recentProjectIds.unshift(projectId);
         recentProjectIds = recentProjectIds.slice(0, 5);
-        try { localStorage.setItem('mrk2_recent', JSON.stringify(recentProjectIds)); } catch (e) {}
+        try { localStorage.setItem('mk2_recent', JSON.stringify(recentProjectIds)); } catch (e) {}
     }
 
     function loadRecentProjects() {
         try {
-            var stored = localStorage.getItem('mrk2_recent');
+            var stored = localStorage.getItem('mk2_recent');
             if (stored) recentProjectIds = JSON.parse(stored);
         } catch (e) { recentProjectIds = []; }
     }
@@ -3825,7 +3833,7 @@
         updateRecentProjects(currentProjectId);
         saveProjectsToStorage();
         displayRecentProjects();
-        document.title = projectName + ' - Maestro Rhythm King MRK-2';
+        document.title = projectName + ' - Rhythm Knight MK-2';
 
         var saveBtn = document.getElementById('saveProjectBtn');
         var originalText = saveBtn.innerHTML;
@@ -3896,7 +3904,7 @@
         document.getElementById('swingDisplay').textContent = swing + '%';
         document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
         document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
-        document.title = project.name + ' - Maestro Rhythm King MRK-2';
+        document.title = project.name + ' - Rhythm Knight MK-2';
 
         for (var i = 0; i < 8; i++) updatePatternHasData(i);
         if (editMode && isCustomPattern) renderSequencer();
@@ -3932,13 +3940,13 @@
                 groove: grooveAmount,
                 patterns: JSON.parse(JSON.stringify(customPatterns)),
                 version: '2.0',
-                type: 'MRK2_PROJECT'
+                type: 'MK2_PROJECT'
             };
 
             var dataBlob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
             var link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = (input.value || 'My_Project').replace(/[^a-z0-9]/gi, '_') + '.mrk2';
+            link.download = (input.value || 'My_Project').replace(/[^a-z0-9]/gi, '_') + '.mk2';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -3957,7 +3965,7 @@
         reader.onload = function(e) {
             try {
                 var projectData = JSON.parse(e.target.result);
-                if (projectData.type !== 'MRK2_PROJECT') throw new Error('Invalid project file');
+                if (projectData.type !== 'MK2_PROJECT') throw new Error('Invalid project file');
 
                 ensurePatternStructure(projectData.patterns);
                 currentProjectId = generateProjectId();
@@ -3980,7 +3988,7 @@
                 closeMenu();
                 showToast('Project "' + projectData.name + '" imported');
             } catch (error) {
-                alert('Error importing project file. Please make sure it\'s a valid .mrk2 file.');
+                alert('Error importing project file. Please make sure it\'s a valid .mk2 file.');
             }
         };
         reader.readAsText(file);
@@ -3997,7 +4005,7 @@
 
         var projectName = 'New Project ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         document.getElementById('projectNameInput').value = projectName;
-        document.title = projectName + ' - Maestro Rhythm King MRK-2';
+        document.title = projectName + ' - Rhythm Knight MK-2';
         saveProject();
         if (editMode && isCustomPattern) renderSequencer();
         displayRecentProjects();
@@ -4007,7 +4015,7 @@
 
     function shareProject() {
         var shareData = {
-            name: document.getElementById('projectNameInput').value || 'MRK-2 Project',
+            name: document.getElementById('projectNameInput').value || 'MK-2 Project',
             tempo: tempo,
             swing: swing,
             groove: grooveAmount,
@@ -4101,12 +4109,12 @@
     }
 
     function saveProjectsToStorage() {
-        try { localStorage.setItem('mrk2_projects', JSON.stringify(savedProjects)); } catch (e) {}
+        try { localStorage.setItem('mk2_projects', JSON.stringify(savedProjects)); } catch (e) {}
     }
 
     function loadProjectsFromStorage() {
         try {
-            var stored = localStorage.getItem('mrk2_projects');
+            var stored = localStorage.getItem('mk2_projects');
             if (stored) savedProjects = JSON.parse(stored);
             loadRecentProjects();
             displayRecentProjects();
@@ -4141,33 +4149,37 @@
 
     window.addEventListener('load', loadSharedProject);
 
-    // Audio Recording Functions
+    // Audio Recording Functions — records to WAV
+    var _recBuffers = [];  // array of Float32Array chunks (stereo interleaved)
+    var _recNode = null;
+    var _recSampleRate = 44100;
+
     function startRecording() {
         if (!audioContext) initAudio();
         if (!drumSynth) { drumSynth = new AnalogDrumSynth(audioContext); drumSynth.setVolume(volume); }
 
         try {
-            streamDestination = audioContext.createMediaStreamDestination();
-            drumSynth.connectToRecorder(streamDestination);
+            _recSampleRate = audioContext.sampleRate;
+            _recBuffers = [];
 
-            var options = {};
-            var types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', 'audio/mp4'];
-            for (var t = 0; t < types.length; t++) {
-                if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(types[t])) {
-                    options.mimeType = types[t];
-                    break;
+            // Use ScriptProcessorNode to capture raw PCM from the master output
+            _recNode = audioContext.createScriptProcessor(4096, 2, 2);
+            _recNode.onaudioprocess = function(e) {
+                var left = e.inputBuffer.getChannelData(0);
+                var right = e.inputBuffer.getChannelData(1);
+                // Interleave L/R into a single buffer
+                var interleaved = new Float32Array(left.length * 2);
+                for (var i = 0; i < left.length; i++) {
+                    interleaved[i * 2] = left[i];
+                    interleaved[i * 2 + 1] = right[i];
                 }
-            }
-
-            mediaRecorder = new MediaRecorder(streamDestination.stream, Object.keys(options).length ? options : undefined);
-            recordedChunks = [];
-
-            mediaRecorder.ondataavailable = function(event) {
-                if (event.data.size > 0) recordedChunks.push(event.data);
+                _recBuffers.push(interleaved);
             };
-            mediaRecorder.onstop = exportRecording;
 
-            mediaRecorder.start(100);
+            // Tap the signal after the tone filter
+            drumSynth.toneFilter.connect(_recNode);
+            _recNode.connect(audioContext.destination); // must be connected to process
+
             recordingStartTime = Date.now();
 
             document.getElementById('startRecordBtn').style.display = 'none';
@@ -4183,14 +4195,21 @@
     }
 
     function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
-            if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
-            document.getElementById('startRecordBtn').style.display = 'flex';
-            document.getElementById('stopRecordBtn').style.display = 'none';
-            document.getElementById('recordingStatus').style.display = 'none';
-            document.querySelector('.power-indicator').classList.remove('recording');
+        if (_recNode) {
+            _recNode.disconnect();
+            if (drumSynth && drumSynth.toneFilter) {
+                try { drumSynth.toneFilter.disconnect(_recNode); } catch(e) {}
+            }
+            _recNode.onaudioprocess = null;
+            _recNode = null;
         }
+        if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
+        document.getElementById('startRecordBtn').style.display = 'flex';
+        document.getElementById('stopRecordBtn').style.display = 'none';
+        document.getElementById('recordingStatus').style.display = 'none';
+        document.querySelector('.power-indicator').classList.remove('recording');
+
+        exportRecording();
     }
 
     function updateRecordingTime() {
@@ -4201,29 +4220,67 @@
     }
 
     function exportRecording() {
-        if (recordedChunks.length === 0) return;
+        if (_recBuffers.length === 0) return;
 
-        var ext = 'webm';
-        if (mediaRecorder.mimeType) {
-            if (mediaRecorder.mimeType.includes('ogg')) ext = 'ogg';
-            else if (mediaRecorder.mimeType.includes('mp4')) ext = 'mp4';
+        // Merge all interleaved chunks into one buffer
+        var totalSamples = 0;
+        for (var i = 0; i < _recBuffers.length; i++) totalSamples += _recBuffers[i].length;
+        var merged = new Float32Array(totalSamples);
+        var offset = 0;
+        for (var i = 0; i < _recBuffers.length; i++) {
+            merged.set(_recBuffers[i], offset);
+            offset += _recBuffers[i].length;
+        }
+        _recBuffers = [];
+
+        // Encode as 16-bit PCM WAV
+        var numChannels = 2;
+        var bytesPerSample = 2;
+        var dataLength = merged.length * bytesPerSample;
+        var buffer = new ArrayBuffer(44 + dataLength);
+        var view = new DataView(buffer);
+
+        // WAV header
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + dataLength, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);             // chunk size
+        view.setUint16(20, 1, true);               // PCM format
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, _recSampleRate, true);
+        view.setUint32(28, _recSampleRate * numChannels * bytesPerSample, true);
+        view.setUint16(32, numChannels * bytesPerSample, true);
+        view.setUint16(34, bytesPerSample * 8, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, dataLength, true);
+
+        // Write PCM samples (clamp to [-1, 1] then scale to 16-bit)
+        var idx = 44;
+        for (var s = 0; s < merged.length; s++) {
+            var sample = Math.max(-1, Math.min(1, merged[s]));
+            view.setInt16(idx, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+            idx += 2;
         }
 
-        var blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+        var blob = new Blob([buffer], { type: 'audio/wav' });
         var url = URL.createObjectURL(blob);
-        var projectName = document.getElementById('projectNameInput').value || 'MRK2_Recording';
+        var projectName = document.getElementById('projectNameInput').value || 'MK2_Recording';
         var timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
 
         var a = document.createElement('a');
         a.href = url;
-        a.download = projectName.replace(/[^a-z0-9]/gi, '_') + '_' + timestamp + '.' + ext;
+        a.download = projectName.replace(/[^a-z0-9]/gi, '_') + '_' + timestamp + '.wav';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         setTimeout(function() { URL.revokeObjectURL(url); }, 100);
-        recordedChunks = [];
-        showToast('Recording saved as ' + ext.toUpperCase());
+        showToast('Recording saved as WAV');
         setTimeout(closeMenu, 500);
+    }
+
+    function writeString(view, offset, str) {
+        for (var i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
     }
 
     document.getElementById('startRecordBtn').addEventListener('click', startRecording);
@@ -4561,16 +4618,26 @@
     (function() {
         var splash = document.getElementById('splashScreen');
         if (!splash) return;
-        setTimeout(function() {
+        var dismissed = false;
+
+        function dismissSplash() {
+            if (dismissed) return;
+            dismissed = true;
             splash.classList.add('fade-out');
             setTimeout(function() {
                 splash.remove();
-                // After splash, check if first run
-                if (!localStorage.getItem('mrk2_onboarded')) {
+                if (!localStorage.getItem('mk2_onboarded')) {
                     showOnboarding();
                 }
             }, 600);
-        }, 1800);
+        }
+
+        // Auto-dismiss after loading animation completes
+        setTimeout(dismissSplash, 1800);
+        // Also dismiss on tap/click/keypress so user isn't blocked
+        splash.addEventListener('click', dismissSplash);
+        splash.addEventListener('touchstart', dismissSplash, { passive: true });
+        document.addEventListener('keydown', dismissSplash, { once: true });
     })();
 
     // === ONBOARDING / FIRST-RUN EXPERIENCE ===
@@ -4669,9 +4736,11 @@
     }
 
     function finishOnboarding() {
-        localStorage.setItem('mrk2_onboarded', '1');
+        localStorage.setItem('mk2_onboarded', '1');
         var overlay = document.getElementById('onboardingOverlay');
         overlay.classList.remove('active');
+        // Use this user gesture to pre-unlock the AudioContext
+        initAudio();
     }
 </script>
 </body>
