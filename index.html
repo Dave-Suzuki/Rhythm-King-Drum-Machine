@@ -1571,14 +1571,18 @@
 
             .pattern-controls {
                 gap: 6px;
+                flex-wrap: nowrap;
             }
 
             .pattern-btn {
                 flex: 1;
                 min-width: 0;
-                padding: 10px 6px;
+                padding: 10px 2px;
                 font-size: 0.65em;
                 letter-spacing: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .pattern-slot {
