@@ -2378,11 +2378,8 @@
     let recentProjectIds = [];
 
     // Recording variables
-    let mediaRecorder = null;
-    let recordedChunks = [];
     let recordingStartTime = 0;
     let recordingInterval = null;
-    let streamDestination = null;
 
     // Waveform visualizer
     let analyser = null;
@@ -2575,9 +2572,7 @@
         }
 
         connectToRecorder(destination) {
-            if (destination) {
-                this.toneFilter.connect(destination);
-            }
+            if (destination) this.toneFilter.connect(destination);
         }
 
         kick(time, variant) {
@@ -4152,33 +4147,37 @@
 
     window.addEventListener('load', loadSharedProject);
 
-    // Audio Recording Functions
+    // Audio Recording Functions — records to WAV
+    var _recBuffers = [];  // array of Float32Array chunks (stereo interleaved)
+    var _recNode = null;
+    var _recSampleRate = 44100;
+
     function startRecording() {
         if (!audioContext) initAudio();
         if (!drumSynth) { drumSynth = new AnalogDrumSynth(audioContext); drumSynth.setVolume(volume); }
 
         try {
-            streamDestination = audioContext.createMediaStreamDestination();
-            drumSynth.connectToRecorder(streamDestination);
+            _recSampleRate = audioContext.sampleRate;
+            _recBuffers = [];
 
-            var options = {};
-            var types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', 'audio/mp4'];
-            for (var t = 0; t < types.length; t++) {
-                if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(types[t])) {
-                    options.mimeType = types[t];
-                    break;
+            // Use ScriptProcessorNode to capture raw PCM from the master output
+            _recNode = audioContext.createScriptProcessor(4096, 2, 2);
+            _recNode.onaudioprocess = function(e) {
+                var left = e.inputBuffer.getChannelData(0);
+                var right = e.inputBuffer.getChannelData(1);
+                // Interleave L/R into a single buffer
+                var interleaved = new Float32Array(left.length * 2);
+                for (var i = 0; i < left.length; i++) {
+                    interleaved[i * 2] = left[i];
+                    interleaved[i * 2 + 1] = right[i];
                 }
-            }
-
-            mediaRecorder = new MediaRecorder(streamDestination.stream, Object.keys(options).length ? options : undefined);
-            recordedChunks = [];
-
-            mediaRecorder.ondataavailable = function(event) {
-                if (event.data.size > 0) recordedChunks.push(event.data);
+                _recBuffers.push(interleaved);
             };
-            mediaRecorder.onstop = exportRecording;
 
-            mediaRecorder.start(100);
+            // Tap the signal after the tone filter
+            drumSynth.toneFilter.connect(_recNode);
+            _recNode.connect(audioContext.destination); // must be connected to process
+
             recordingStartTime = Date.now();
 
             document.getElementById('startRecordBtn').style.display = 'none';
@@ -4194,14 +4193,21 @@
     }
 
     function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
-            if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
-            document.getElementById('startRecordBtn').style.display = 'flex';
-            document.getElementById('stopRecordBtn').style.display = 'none';
-            document.getElementById('recordingStatus').style.display = 'none';
-            document.querySelector('.power-indicator').classList.remove('recording');
+        if (_recNode) {
+            _recNode.disconnect();
+            if (drumSynth && drumSynth.toneFilter) {
+                try { drumSynth.toneFilter.disconnect(_recNode); } catch(e) {}
+            }
+            _recNode.onaudioprocess = null;
+            _recNode = null;
         }
+        if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
+        document.getElementById('startRecordBtn').style.display = 'flex';
+        document.getElementById('stopRecordBtn').style.display = 'none';
+        document.getElementById('recordingStatus').style.display = 'none';
+        document.querySelector('.power-indicator').classList.remove('recording');
+
+        exportRecording();
     }
 
     function updateRecordingTime() {
@@ -4212,29 +4218,67 @@
     }
 
     function exportRecording() {
-        if (recordedChunks.length === 0) return;
+        if (_recBuffers.length === 0) return;
 
-        var ext = 'webm';
-        if (mediaRecorder.mimeType) {
-            if (mediaRecorder.mimeType.includes('ogg')) ext = 'ogg';
-            else if (mediaRecorder.mimeType.includes('mp4')) ext = 'mp4';
+        // Merge all interleaved chunks into one buffer
+        var totalSamples = 0;
+        for (var i = 0; i < _recBuffers.length; i++) totalSamples += _recBuffers[i].length;
+        var merged = new Float32Array(totalSamples);
+        var offset = 0;
+        for (var i = 0; i < _recBuffers.length; i++) {
+            merged.set(_recBuffers[i], offset);
+            offset += _recBuffers[i].length;
+        }
+        _recBuffers = [];
+
+        // Encode as 16-bit PCM WAV
+        var numChannels = 2;
+        var bytesPerSample = 2;
+        var dataLength = merged.length * bytesPerSample;
+        var buffer = new ArrayBuffer(44 + dataLength);
+        var view = new DataView(buffer);
+
+        // WAV header
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + dataLength, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);             // chunk size
+        view.setUint16(20, 1, true);               // PCM format
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, _recSampleRate, true);
+        view.setUint32(28, _recSampleRate * numChannels * bytesPerSample, true);
+        view.setUint16(32, numChannels * bytesPerSample, true);
+        view.setUint16(34, bytesPerSample * 8, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, dataLength, true);
+
+        // Write PCM samples (clamp to [-1, 1] then scale to 16-bit)
+        var idx = 44;
+        for (var s = 0; s < merged.length; s++) {
+            var sample = Math.max(-1, Math.min(1, merged[s]));
+            view.setInt16(idx, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+            idx += 2;
         }
 
-        var blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+        var blob = new Blob([buffer], { type: 'audio/wav' });
         var url = URL.createObjectURL(blob);
         var projectName = document.getElementById('projectNameInput').value || 'MK2_Recording';
         var timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
 
         var a = document.createElement('a');
         a.href = url;
-        a.download = projectName.replace(/[^a-z0-9]/gi, '_') + '_' + timestamp + '.' + ext;
+        a.download = projectName.replace(/[^a-z0-9]/gi, '_') + '_' + timestamp + '.wav';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         setTimeout(function() { URL.revokeObjectURL(url); }, 100);
-        recordedChunks = [];
-        showToast('Recording saved as ' + ext.toUpperCase());
+        showToast('Recording saved as WAV');
         setTimeout(closeMenu, 500);
+    }
+
+    function writeString(view, offset, str) {
+        for (var i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
     }
 
     document.getElementById('startRecordBtn').addEventListener('click', startRecording);
