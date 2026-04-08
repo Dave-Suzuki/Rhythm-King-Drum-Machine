@@ -2220,7 +2220,14 @@
                     <div class="knob-wrapper" data-slider="grooveSlider">
                         <div class="knob"><div class="knob-indicator"></div></div>
                     </div>
-                    <input type="range" class="slider" id="grooveSlider" min="0" max="200" value="100">
+                    <input type="range" class="slider" id="grooveSlider" min="0" max="100" value="0">
+                    <select id="grooveTypeSelect" style="display:block;width:100%;margin-top:4px;background:#222;color:#aaa;border:1px solid #444;border-radius:3px;font-size:0.48em;padding:2px 1px;text-align:center;cursor:pointer;">
+                        <option value="none">Off</option>
+                        <option value="dangelo">D'Angelo</option>
+                        <option value="dilla">J Dilla</option>
+                        <option value="funk">Funk</option>
+                        <option value="boombap">Boom Bap</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -2334,27 +2341,110 @@
     let timerID;
     let volume = 0.7;
     let balance = 0.5; // Tone: 0 = dark/muffled, 1 = bright/crisp
-    let grooveAmount = 0; // -1.0 (laid back) to +1.0 (on top)
+    let grooveAmount = 0; // 0.0 (off) to 1.0 (full groove)
 
-    var GROOVE_PROFILES = {
-        kick:      { multiplier: 0.0, maxMs: 20 },
-        kick2:     { multiplier: 0.0, maxMs: 20 },
-        snare:     { multiplier: 1.0, maxMs: 20 },
-        hihat:     { multiplier: 0.6, maxMs: 20 },
-        hihat2:    { multiplier: 0.6, maxMs: 20 },
-        clap:      { multiplier: 0.9, maxMs: 20 },
-        tom:       { multiplier: 0.5, maxMs: 20 },
-        cymbal:    { multiplier: 0.3, maxMs: 20 }
+    // ==============================
+    // GROOVE ENGINE v2
+    // Per-step, per-instrument microtiming profiles (values in milliseconds)
+    // Positive = late (behind grid), Negative = early (ahead of grid)
+    // Based on academic microtiming analysis:
+    //   - Danielsen (2010): D'Angelo "Voodoo" beat bins & snare rushing
+    //   - Câmara/Danielsen (2018): J Dilla MPC microtiming
+    //   - Keil (1995): participatory discrepancies (30-70ms range)
+    // ==============================
+
+    var currentGrooveType = 'none';
+
+    var GROOVE_TYPES = {
+
+        none: {
+            kick:   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            kick2:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            snare:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            clap:   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            hihat:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            hihat2: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            cymbal: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            tom:    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        },
+
+        // D'Angelo / Neo-Soul ("Voodoo" aesthetic)
+        // Research: Questlove's kick = grid anchor. Snare RUSHES beats 2&4
+        // by ~1/64th note. Hi-hat drifts from ahead to behind across bar.
+        // Ghost notes slightly late for "seasick" push-pull contrast.
+        dangelo: {
+            kick:   [  0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0],
+            kick2:  [  0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0],
+            snare:  [  0,  0,  0,  0, -25,  0,  0, +8,   0,  0,  0,  0, -20,  0,  0,+10],
+            clap:   [  0,  0,  0,  0, -22,  0,  0, +6,   0,  0,  0,  0, -18,  0,  0, +8],
+            hihat:  [ -8, -5, -3,  0,  +3, +6, +8,+10, +12,+13,+15,+16, +17,+18,+18,+18],
+            hihat2: [ -6, -4, -2,  0,  +2, +5, +7, +9, +10,+12,+13,+14, +15,+16,+16,+16],
+            cymbal: [ +5, +5, +5, +5,  +5, +5, +5, +5,  +5, +5, +5, +5,  +5, +5, +5, +5],
+            tom:    [  0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0]
+        },
+
+        // J Dilla: controlled chaos via MPC time-shift
+        // Research: 10/13 kick notes off-grid (erratic but intentional),
+        // snare slightly "on top" (early), hi-hat asymmetric swing
+        dilla: {
+            kick:   [  0,+30,  0,+20, +35,  0,  0,+25,   0,+40,  0,+15, +30,  0,+20,+35],
+            kick2:  [  0,+25,  0,+18, +30,  0,  0,+22,   0,+35,  0,+12, +28,  0,+18,+30],
+            snare:  [ -8, -5, -6, -7,  -8, -6, -5, -7,  -6, -8, -5, -7,  -8, -6, -7, -5],
+            clap:   [ -6, -4, -5, -6,  -7, -5, -4, -6,  -6, -7, -5, -6,  -7, -5, -6, -4],
+            hihat:  [ -5,+18, -5,+20,  -5,+16, -5,+22,  -5,+18, -5,+20,  -5,+16, -5,+22],
+            hihat2: [ -5,+15, -5,+18,  -5,+14, -5,+20,  -5,+15, -5,+18,  -5,+14, -5,+20],
+            cymbal: [  0, +5,  0, +8,   0, +5,  0, +8,   0, +5,  0, +8,   0, +5,  0, +8],
+            tom:    [  0,+10,  0, +8, +12,  0,  0,+10,   0,+15,  0, +6, +10,  0, +8,+12]
+        },
+
+        // Funk / James Brown: "on top" — everything pushed early
+        // Research: funk swing typically 1.1:1 to 1.3:1, pushed feel
+        funk: {
+            kick:   [ -5, -3, -5, -3,  -5, -3, -5, -3,  -5, -3, -5, -3,  -5, -3, -5, -3],
+            kick2:  [ -5, -3, -5, -3,  -5, -3, -5, -3,  -5, -3, -5, -3,  -5, -3, -5, -3],
+            snare:  [ -6, -4, -8, -4,  -6, -4, -8, -4,  -6, -4, -8, -4,  -6, -4, -8, -4],
+            clap:   [ -6, -4, -7, -4,  -6, -4, -7, -4,  -6, -4, -7, -4,  -6, -4, -7, -4],
+            hihat:  [ -5,-12, -5,-12,  -5,-12, -5,-12,  -5,-12, -5,-12,  -5,-12, -5,-12],
+            hihat2: [ -5,-10, -5,-10,  -5,-10, -5,-10,  -5,-10, -5,-10,  -5,-10, -5,-10],
+            cymbal: [ -3, -2, -3, -2,  -3, -2, -3, -2,  -3, -2, -3, -2,  -3, -2, -3, -2],
+            tom:    [ -4, -3, -4, -3,  -4, -3, -4, -3,  -4, -3, -4, -3,  -4, -3, -4, -3]
+        },
+
+        // Hip-Hop / Boom Bap: conservative laid-back, snare late on beats 2&4
+        boombap: {
+            kick:   [  0,  0, +5,  0,   0,  0, +5,  0,   0,  0, +5,  0,   0,  0, +5,  0],
+            kick2:  [  0,  0, +5,  0,   0,  0, +5,  0,   0,  0, +5,  0,   0,  0, +5,  0],
+            snare:  [  0,  0,  0,  0, +12,  0,  0,  0,   0,  0,  0,  0, +15,  0,  0,  0],
+            clap:   [  0,  0,  0,  0, +10,  0,  0,  0,   0,  0,  0,  0, +12,  0,  0,  0],
+            hihat:  [ +4,+10, +4,+10,  +4,+10, +4,+10,  +4,+10, +4,+10,  +4,+10, +4,+10],
+            hihat2: [ +4, +8, +4, +8,  +4, +8, +4, +8,  +4, +8, +4, +8,  +4, +8, +4, +8],
+            cymbal: [ +2, +2, +2, +2,  +2, +2, +2, +2,  +2, +2, +2, +2,  +2, +2, +2, +2],
+            tom:    [  0,  0, +3,  0,   0,  0, +3,  0,   0,  0, +3,  0,   0,  0, +3,  0]
+        }
     };
 
-    function getGrooveOffset(instrument) {
-        var profile = GROOVE_PROFILES[instrument];
-        if (!profile) return 0;
-        // Negative grooveAmount = laid back (late), positive = on top (early)
-        // Negate so positive grooveAmount shifts notes earlier in time
-        var offsetMs = -grooveAmount * profile.multiplier * profile.maxMs;
-        var humanize = Math.random() * 6 - 3; // ±3ms
-        return (offsetMs + humanize) / 1000;
+    function getGrooveOffset(instrument, stepNumber) {
+        if (currentGrooveType === 'none') return 0;
+
+        var type = GROOVE_TYPES[currentGrooveType];
+        if (!type || !type[instrument]) return 0;
+
+        var baseOffsetMs = type[instrument][stepNumber % 16];
+
+        // Scale by groove amount knob (0.0 = off, 1.0 = full)
+        var scaledMs = baseOffsetMs * grooveAmount;
+
+        // Tempo-dependent scaling: offsets are calibrated for 120BPM.
+        // At faster tempos they'd be too large a fraction of the beat;
+        // at slower tempos they can be more generous.
+        // 120BPM→1.0x, 180BPM→0.67x, 80BPM→1.5x (clamped 0.5-1.5)
+        var tempoFactor = Math.min(1.5, Math.max(0.5, 120 / tempo));
+        scaledMs *= tempoFactor;
+
+        // Humanization: ±5ms random jitter
+        var humanize = Math.random() * 10 - 5;
+
+        return (scaledMs + humanize) / 1000;
     }
 
     // Tap tempo variables
@@ -3055,22 +3145,22 @@
         if (isCustomPattern && customPatterns[currentPatternSlot]) {
             pattern = customPatterns[currentPatternSlot].pattern;
             if (pattern) {
-                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick'), 1);
-                if (pattern.kick2 && pattern.kick2[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick2'), 2);
-                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time + getGrooveOffset('snare'));
-                if (pattern.clap && pattern.clap[beatNumber]) drumSynth.clap(time + getGrooveOffset('clap'));
-                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat'), false);
-                if (pattern.hihat2 && pattern.hihat2[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat2'), true);
-                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time + getGrooveOffset('cymbal'));
-                if (pattern.tom && pattern.tom[beatNumber]) drumSynth.tom(time + getGrooveOffset('tom'));
+                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick', beatNumber), 1);
+                if (pattern.kick2 && pattern.kick2[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick2', beatNumber), 2);
+                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time + getGrooveOffset('snare', beatNumber));
+                if (pattern.clap && pattern.clap[beatNumber]) drumSynth.clap(time + getGrooveOffset('clap', beatNumber));
+                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat', beatNumber), false);
+                if (pattern.hihat2 && pattern.hihat2[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat2', beatNumber), true);
+                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time + getGrooveOffset('cymbal', beatNumber));
+                if (pattern.tom && pattern.tom[beatNumber]) drumSynth.tom(time + getGrooveOffset('tom', beatNumber));
             }
         } else if (currentRhythm && rhythmPatterns[currentRhythm]) {
             pattern = rhythmPatterns[currentRhythm];
             if (pattern) {
-                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick'), 1);
-                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time + getGrooveOffset('snare'));
-                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat'), false);
-                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time + getGrooveOffset('cymbal'));
+                if (pattern.kick && pattern.kick[beatNumber]) drumSynth.kick(time + getGrooveOffset('kick', beatNumber), 1);
+                if (pattern.snare && pattern.snare[beatNumber]) drumSynth.snare(time + getGrooveOffset('snare', beatNumber));
+                if (pattern.hihat && pattern.hihat[beatNumber]) drumSynth.hihat(time + getGrooveOffset('hihat', beatNumber), false);
+                if (pattern.cymbal && pattern.cymbal[beatNumber]) drumSynth.cymbal(time + getGrooveOffset('cymbal', beatNumber));
             }
         }
 
@@ -3084,14 +3174,16 @@
     function nextNote() {
         var secondsPerBeat = 60.0 / tempo / 4;
 
-        // Apply swing: delay off-beats, compensate on-beats to keep overall tempo
-        var swingOffset = (swing / 100) * secondsPerBeat * 0.33;
+        // Ratio-based swing: 0=straight (1:1), 100=triplet (2:1)
+        var swingRatio = 1.0 + (swing / 100) * 1.0;
+        var totalPairTime = secondsPerBeat * 2;
+
         if (currentStep % 2 === 1) {
-            // Off-beat: delay by swing amount
-            nextNoteTime += secondsPerBeat + swingOffset;
+            // Off-beat: shorter note in swing pair
+            nextNoteTime += totalPairTime / (1 + swingRatio);
         } else {
-            // On-beat: arrive early to compensate
-            nextNoteTime += secondsPerBeat - swingOffset;
+            // On-beat: longer note in swing pair
+            nextNoteTime += totalPairTime * swingRatio / (1 + swingRatio);
         }
 
         currentStep = (currentStep + 1) % 16;
@@ -3290,20 +3382,17 @@
         if (sv) sv.textContent = swing + '%';
     });
 
-    // Groove control (slider range 0-200, mapped to -1.0 to +1.0)
+    // Groove control (0=off, 100=full)
     document.getElementById('grooveSlider').addEventListener('input', function(e) {
-        var raw = parseInt(e.target.value);
-        // Snap to center (100) when within ±5
-        if (Math.abs(raw - 100) <= 5) {
-            raw = 100;
-            e.target.value = 100;
-        }
-        grooveAmount = (raw - 100) / 100;
+        grooveAmount = parseInt(e.target.value) / 100;
         var gv = document.getElementById('grooveValue');
-        if (gv) {
-            var pct = Math.round(grooveAmount * 100);
-            gv.textContent = (pct > 0 ? '+' : '') + pct + '%';
-        }
+        if (gv) gv.textContent = Math.round(grooveAmount * 100) + '%';
+    });
+
+    // Groove type selector
+    document.getElementById('grooveTypeSelect').addEventListener('change', function(e) {
+        currentGrooveType = e.target.value;
+        showToast('Groove: ' + e.target.selectedOptions[0].text);
     });
 
     // Rotary knob interaction
@@ -3336,10 +3425,7 @@
                 if (el) el.textContent = val + '%';
             } else if (sliderId === 'grooveSlider') {
                 var el = document.getElementById('grooveValue');
-                if (el) {
-                    var pct = Math.round((val - 100));
-                    el.textContent = (pct > 0 ? '+' : '') + pct + '%';
-                }
+                if (el) el.textContent = val + '%';
             }
         }
 
@@ -3370,11 +3456,6 @@
                 var dy = startY - pt.clientY;
                 var sensitivity = range / 120;
                 var newVal = Math.round(Math.min(slider.max, Math.max(slider.min, startVal + dy * sensitivity)));
-                // Center snap for groove knob
-                if (sliderId === 'grooveSlider') {
-                    var mid = (parseFloat(slider.max) + parseFloat(slider.min)) / 2;
-                    if (Math.abs(newVal - mid) <= 5) newVal = mid;
-                }
                 slider.value = newVal;
                 slider.dispatchEvent(new Event('input'));
                 setKnobRotation(wrapper, getSliderNorm(slider));
@@ -3826,8 +3907,9 @@
             tempo: tempo,
             swing: swing,
             groove: grooveAmount,
+            grooveType: currentGrooveType,
             patterns: JSON.parse(JSON.stringify(customPatterns)),
-            version: '2.0'
+            version: '2.1'
         };
 
         updateRecentProjects(currentProjectId);
@@ -3895,14 +3977,17 @@
         customPatterns = JSON.parse(JSON.stringify(project.patterns));
         tempo = project.tempo || 120;
         swing = project.swing || 0;
-        grooveAmount = project.groove || 0;
+        grooveAmount = Math.abs(project.groove || 0); // Math.abs for backward compat with old bidirectional values
+        currentGrooveType = project.grooveType || 'none';
+        var gts = document.getElementById('grooveTypeSelect');
+        if (gts) gts.value = currentGrooveType;
 
         document.getElementById('projectNameInput').value = project.name;
         document.getElementById('tempoSlider').value = tempo;
         document.getElementById('tempoDisplay').textContent = tempo;
         document.getElementById('swingSlider').value = swing;
         document.getElementById('swingDisplay').textContent = swing + '%';
-        document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
+        document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100);
         document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
         document.title = project.name + ' - Rhythm Knight MK-2';
 
@@ -3972,15 +4057,18 @@
                 customPatterns = JSON.parse(JSON.stringify(projectData.patterns));
                 tempo = projectData.tempo || 120;
                 swing = projectData.swing || 0;
-                grooveAmount = projectData.groove || 0;
+                grooveAmount = Math.abs(projectData.groove || 0);
+                currentGrooveType = projectData.grooveType || 'none';
 
                 document.getElementById('projectNameInput').value = projectData.name + ' (Imported)';
                 document.getElementById('tempoSlider').value = tempo;
                 document.getElementById('tempoDisplay').textContent = tempo;
                 document.getElementById('swingSlider').value = swing;
                 document.getElementById('swingDisplay').textContent = swing + '%';
-                document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
+                document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100);
                 document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
+                var gts = document.getElementById('grooveTypeSelect');
+                if (gts) gts.value = currentGrooveType;
 
                 for (var i = 0; i < 8; i++) updatePatternHasData(i);
                 saveProject();
@@ -4019,6 +4107,7 @@
             tempo: tempo,
             swing: swing,
             groove: grooveAmount,
+            grooveType: currentGrooveType,
             patterns: JSON.parse(JSON.stringify(customPatterns))
         };
 
@@ -4042,15 +4131,18 @@
                 customPatterns = shareData.patterns;
                 tempo = shareData.tempo || 120;
                 swing = shareData.swing || 0;
-                grooveAmount = shareData.groove || 0;
+                grooveAmount = Math.abs(shareData.groove || 0);
+                currentGrooveType = shareData.grooveType || 'none';
 
                 document.getElementById('projectNameInput').value = shareData.name + ' (Shared)';
                 document.getElementById('tempoSlider').value = tempo;
                 document.getElementById('tempoDisplay').textContent = tempo;
                 document.getElementById('swingSlider').value = swing;
                 document.getElementById('swingDisplay').textContent = swing + '%';
-                document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100 + 100);
+                document.getElementById('grooveSlider').value = Math.round(grooveAmount * 100);
                 document.getElementById('grooveSlider').dispatchEvent(new Event('input'));
+                var gts = document.getElementById('grooveTypeSelect');
+                if (gts) gts.value = currentGrooveType;
 
                 for (var i = 0; i < 8; i++) updatePatternHasData(i);
                 window.location.hash = '';
